@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class GameControl : MonoBehaviour {
 
-	//public Text[] buttonList;
+	public Text[] buttonList;
 	private string playerSide;
 
 	void Awake(){
@@ -17,7 +17,9 @@ public class GameControl : MonoBehaviour {
 		return "1";
 	}
 
-	public void SetPlayerSide(String newPlayer){
-		return newPlayer;
+	public void SetPlayerSide(string newPlayer){
+		playerSide = newPlayer;
 	}
+
+	
 }

@@ -6,13 +6,19 @@ using UnityEngine.UI;
 
 public class GridSpace : MonoBehaviour {
 
-	public Button button;
-	public Text buttonText;
+	private Button button;
+	private SpriteRenderer spriteRend;
 
 
-	private GameControl gameControl;
+	public GameControl gameControl;
 
 
+	public void Start(){
+		button = GetComponent<Button>();
+		spriteRend = GetComponentInChildren<SpriteRenderer>();
+		button.onClick.AddListener(SetSpace);
+
+	}
 	public void  SetGameControlReference(GameControl control){
 		gameControl = control;
 	}
@@ -23,14 +29,15 @@ public class GridSpace : MonoBehaviour {
 		if (gameControl.GetPlayerSide() == "1"){
 
 
-			buttonText.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("reimu/large");
+			spriteRend.sprite = Resources.Load<Sprite>("reimu/large");
 			gameControl.SetPlayerSide("2");
 		}
 		else{ 
-			buttonText.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("marisa/large");
+			spriteRend.sprite = Resources.Load<Sprite>("marisa/large");
 			gameControl.SetPlayerSide("1");
 		}
 
 		button.interactable = false;
 	}
+	
 }
