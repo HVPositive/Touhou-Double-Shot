@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,18 +26,29 @@ public class GridSpace : MonoBehaviour {
 
 	public void SetSpace(){
 
-		if (gameControl.GetPlayerSide() == "1"){
-
-
-			spriteRend.sprite = Resources.Load<Sprite>("reimu/large");
-			gameControl.SetPlayerSide("2");
+		if (gameControl.GetBoardCounter() == 0){
+			SetSprite("reimu", "large");
 		}
-		else{ 
-			spriteRend.sprite = Resources.Load<Sprite>("marisa/large");
-			gameControl.SetPlayerSide("1");
-		}
+		else if (gameControl.GetBoardCounter() == 1)
+			SetSprite("reimu", "medium");
+		else if (gameControl.GetBoardCounter() == 2)
+			SetSprite("reimu", "small");
+		else if (gameControl.GetBoardCounter() == 3)
+			SetSprite("marisa", "large");			
+		else if (gameControl.GetBoardCounter() == 4)
+			SetSprite("marisa", "medium");
+		else if (gameControl.GetBoardCounter() == 5)
+			SetSprite("marisa", "small");
 
-		button.interactable = false;
+		gameControl.IncBoardCounter();
+		//button.interactable = false;
 	}
 	
+	public void SetSprite(string character, string size){
+		spriteRend.sprite = Resources.Load<Sprite>(character + "/" + size);
+		gameControl.AddLocation(character + " " + size, this.name);
+
+
+
+	}	
 }

@@ -7,19 +7,35 @@ public class GameControl : MonoBehaviour {
 
 	public Text[] buttonList;
 	private string playerSide;
+	private int boardCounter;
+	private Dictionary<string,string> locations;
 
-	void Awake(){
+	private void Start(){
 
-		playerSide = "1";
+		boardCounter = 0;
+		playerSide = "0";
+
+		locations = new Dictionary<string,string>();
 	}
 
 	public string GetPlayerSide(){
-		return "1";
+		return playerSide;
 	}
 
 	public void SetPlayerSide(string newPlayer){
 		playerSide = newPlayer;
 	}
 
+	public void IncBoardCounter(){
+		boardCounter++;
+	}
+
+	public int GetBoardCounter(){
+		return boardCounter;
+	}
+
+	public void AddLocation(string item, string gridspace){
+		locations.Add(item, gridspace);
+	}
 	
 }
