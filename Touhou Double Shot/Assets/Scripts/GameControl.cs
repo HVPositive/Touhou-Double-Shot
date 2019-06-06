@@ -34,8 +34,11 @@ public class GameControl : MonoBehaviour {
 		return boardCounter;
 	}
 
-	public void AddLocation(string item, string gridspace){
-		locations.Add(item, gridspace);
+	public void AddLocation(string gridspace, string item){
+		locations.Add(gridspace, item);
 	}
-	
+	public Dictionary<string,string> GetLocations(){
+		return locations;
+	}
+
 }

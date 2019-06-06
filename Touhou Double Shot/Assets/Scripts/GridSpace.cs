@@ -17,6 +17,19 @@ public class GridSpace : MonoBehaviour {
 		button = GetComponent<Button>();
 		spriteRend = GetComponentInChildren<SpriteRenderer>();
 		button.onClick.AddListener(SetSpace);
+		button.onClick.AddListener(CheckHit);
+
+	}
+
+	public void Update(){
+		if (gameControl.GetBoardCounter() ==6){
+			button.onClick.RemoveListener(SetSpace);
+			//button.onClick.AddListener(CheckHit);
+			gameControl.IncBoardCounter();
+			//Debug.Log("test");
+
+		}
+
 
 	}
 	public void  SetGameControlReference(GameControl control){
@@ -43,12 +56,26 @@ public class GridSpace : MonoBehaviour {
 		gameControl.IncBoardCounter();
 		//button.interactable = false;
 	}
+
 	
 	public void SetSprite(string character, string size){
 		spriteRend.sprite = Resources.Load<Sprite>(character + "/" + size);
-		gameControl.AddLocation(character + " " + size, this.name);
+		//gameControl.AddLocation(character + " " + size, this.name);
+		gameControl.AddLocation(this.name, character + " " + size);
 
 
 
-	}	
+	}
+
+	public void CheckHit(){
+		if (gameControl.GetBoardCounter() < 6){
+			return;
+		}
+		if (gameControl.GetLocations().ContainsKey(this.name) ){
+			Debug.Log("nice hit");
+		} else{
+			Debug.Log("nice miss");
+		}
+
+	} 	
 }
