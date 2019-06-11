@@ -384,6 +384,21 @@ Prefab:
       propertyPath: gameControl
       value: 
       objectReference: {fileID: 497412328}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_Size.x
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_AutoTiling
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_Size.y
+      value: 85
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ab63ac636eccc24b8003d4adac37a68, type: 2}
   m_IsPrefabAsset: 0
@@ -1097,6 +1112,21 @@ Prefab:
       propertyPath: gameControl
       value: 
       objectReference: {fileID: 497412328}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_Size.x
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_Size.y
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: 61072469439358796, guid: 3ab63ac636eccc24b8003d4adac37a68,
+        type: 2}
+      propertyPath: m_EdgeRadius
+      value: 25
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3ab63ac636eccc24b8003d4adac37a68, type: 2}
   m_IsPrefabAsset: 0

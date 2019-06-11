@@ -22,13 +22,10 @@ public class GridSpace : MonoBehaviour {
 	}
 
 	public void Update(){
-		if (gameControl.GetBoardCounter() ==6){
-			button.onClick.RemoveListener(SetSpace);
-			//button.onClick.AddListener(CheckHit);
-			gameControl.IncBoardCounter();
-			//Debug.Log("test");
+		//if (gameControl.GetBoardCounter() ==6){
+			
 
-		}
+		//}
 
 
 	}
@@ -38,7 +35,7 @@ public class GridSpace : MonoBehaviour {
 
 
 	public void SetSpace(){
-
+		//Sets up the board depending on selected space.
 		if (gameControl.GetBoardCounter() == 0){
 			SetSprite("reimu", "large");
 		}
@@ -53,7 +50,12 @@ public class GridSpace : MonoBehaviour {
 		else if (gameControl.GetBoardCounter() == 5)
 			SetSprite("marisa", "small");
 
-		gameControl.IncBoardCounter();
+		//only increment if all set. Afterwards, this listener is usless and should be removed if activated.
+		if (gameControl.GetBoardCounter() < 6)
+			gameControl.IncBoardCounter();
+		else 
+			button.onClick.RemoveListener(SetSpace);
+
 		//button.interactable = false;
 	}
 
@@ -73,9 +75,27 @@ public class GridSpace : MonoBehaviour {
 		}
 		if (gameControl.GetLocations().ContainsKey(this.name) ){
 			Debug.Log("nice hit");
+		} else if (CheckGraze()){
+			Debug.Log("nice graze");
 		} else{
 			Debug.Log("nice miss");
 		}
 
 	} 	
+
+
+	public bool CheckGraze(){
+
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.up);
+
+		if (gameControl.GetLocations().ContainsKey(hit.collider.gameObject.name)){
+
+			return true;
+
+		}else{
+			return false;
+		}
+
+
+	}
 }
