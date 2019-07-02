@@ -17,8 +17,9 @@ public class GridSpace : MonoBehaviour {
 	public void Start(){
 		button = GetComponent<Button>();
 		spriteRend = GetComponentInChildren<SpriteRenderer>();
-		button.onClick.AddListener(SetSpace);
 		button.onClick.AddListener(CheckHit);
+		button.onClick.AddListener(SetSpace);
+
 
 	}
 
@@ -36,27 +37,35 @@ public class GridSpace : MonoBehaviour {
 
 
 	public void SetSpace(){
-		//Sets up the board depending on selected space.
-		if (gameControl.GetBoardCounter() == 0){
-			SetSprite(1, "large");
-		}
-		else if (gameControl.GetBoardCounter() == 1)
-			SetSprite(1, "medium");
-		else if (gameControl.GetBoardCounter() == 2)
-			SetSprite(1, "small");
-		else if (gameControl.GetBoardCounter() == 3)
-			SetSprite(2, "large");			
-		else if (gameControl.GetBoardCounter() == 4)
-			SetSprite(2, "medium");
-		else if (gameControl.GetBoardCounter() == 5)
-			SetSprite(2, "small");
 
-		//only increment if all set. Afterwards, this listener is usless and should be removed if activated.
-		if (gameControl.GetBoardCounter() < 6)
-			gameControl.IncBoardCounter();
-		else 
+		if (gameControl.BattleState())
 			button.onClick.RemoveListener(SetSpace);
+		else{
 
+			//Sets up the board depending on selected space.
+			if (gameControl.GetBoardCounter() == 0){
+				SetSprite(1, "large");
+			}
+			else if (gameControl.GetBoardCounter() == 1)
+				SetSprite(1, "medium");
+			else if (gameControl.GetBoardCounter() == 2)
+				SetSprite(1, "small");
+			else if (gameControl.GetBoardCounter() == 3)
+				SetSprite(2, "large");			
+			else if (gameControl.GetBoardCounter() == 4)
+				SetSprite(2, "medium");
+			else if (gameControl.GetBoardCounter() == 5)
+				SetSprite(2, "small");
+
+			gameControl.IncBoardCounter();
+
+			//only increment if all set. Afterwards, this listener is usless and should be removed if activated.
+			if (gameControl.GetBoardCounter() >= 6){
+				gameControl.ToggleBattle();
+				gameControl.ResetBoardCounter();
+			}
+
+		}
 		//button.interactable = false;
 	}
 
@@ -75,7 +84,7 @@ public class GridSpace : MonoBehaviour {
 	//even is p1, odd is p2 turn
 
 	public void CheckHit(){
-		if (gameControl.GetBoardCounter() < 6){
+		if (!gameControl.BattleState()){
 			return;
 		}
 
