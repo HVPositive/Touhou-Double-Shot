@@ -8,6 +8,11 @@ public class GameControl : MonoBehaviour {
 
 	public Text[] buttonList;
 	public Text currentPlayerText;
+	public Text currentCommandText;
+	public Transform p1Status;
+	public Transform p2Status;
+
+
 	private string playerSide;
 	private int boardCounter;
 	private bool battleStart;
@@ -16,6 +21,8 @@ public class GameControl : MonoBehaviour {
 
 	private string p1Char;
 	private string p2Char;
+
+	private string command;
 
 	private void Start(){
 
@@ -30,15 +37,23 @@ public class GameControl : MonoBehaviour {
 		p1Char = "reimu";
 		p2Char = "marisa";
 
+		command = "";
+
 	}
 
 	private void Update(){
 
 		if (battleStart){
+
+
+			//Handle Player Turn Text
 			if (boardCounter%2 == 0)
 				currentPlayerText.text = p1Char;
 			else
 				currentPlayerText.text = p2Char;
+
+			//Handle Current Command Text
+			currentCommandText.text = command;
 
 		}
 
@@ -68,6 +83,13 @@ public class GameControl : MonoBehaviour {
 		return battleStart;
 	}
 
+	public void StartBattle(){
+
+		ToggleBattle();
+		ResetBoardCounter();
+		SetUpStatus();
+	}
+
 	public void ToggleBattle(){
 		battleStart = !battleStart;
 	}
@@ -93,4 +115,38 @@ public class GameControl : MonoBehaviour {
 		return p2Char;
 	}
 
+	public string GetCommand(){
+		return command;
+	}
+	public void SetAttackCommand(){
+		command = "attack";
+	}
+	public void SetMoveCommand(){
+		command = "move";
+	}
+	public void ResetCommand(){
+		command = "";
+	}
+
+	public void SetUpStatus(){
+		Transform currentItem;
+
+
+		SetPlayerStatus(p1Char, p1Status);
+		SetPlayerStatus(p2Char, p2Status);
+
+
+	}
+
+	public void SetPlayerStatus(string charName, Transform playerStatus){
+		Transform currentItem;
+
+
+		for (int i =0; i< playerStatus.childCount; i++){
+			currentItem = playerStatus.GetChild(i);
+			currentItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(charName + "/" + currentItem.name);
+
+		}
+	}
 }
+
