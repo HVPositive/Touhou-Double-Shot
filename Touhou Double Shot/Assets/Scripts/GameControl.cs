@@ -16,8 +16,8 @@ public class GameControl : MonoBehaviour {
 	private string playerSide;
 	private int boardCounter;
 	private bool battleStart;
-	private Dictionary<string,Items.Item> p1Locations;
-	private Dictionary<string,Items.Item> p2Locations;
+	private Dictionary<string,Item> p1Locations;
+	private Dictionary<string,Item> p2Locations;
 
 	private string p1Char;
 	private string p2Char;
@@ -31,8 +31,8 @@ public class GameControl : MonoBehaviour {
 
 		battleStart = false;
 
-		p1Locations = new Dictionary<string,Items.Item>();
-		p2Locations = new Dictionary<string,Items.Item>();
+		p1Locations = new Dictionary<string,Item>();
+		p2Locations = new Dictionary<string,Item>();
 
 		p1Char = "reimu";
 		p2Char = "marisa";
@@ -95,16 +95,16 @@ public class GameControl : MonoBehaviour {
 	}
 
 
-	public void AddLocation(string gridspace, Items.Item newI, int playerNum){
+	public void AddLocation(string gridspace, Item newI, int playerNum){
 		GetLocations(playerNum).Add(gridspace, newI);
 	}
-	public Dictionary<string,Items.Item> GetLocations(int playerNum){
+	public Dictionary<string,Item> GetLocations(int playerNum){
 		if (playerNum == 1)
 			return p1Locations;
 		else if (playerNum == 2)
 			return p2Locations;
 		else 
-			return new Dictionary<string,Items.Item>(); //empty list
+			return new Dictionary<string,Item>(); //empty list
 	}
 
 	public string GetP1Char(){

@@ -74,7 +74,7 @@ public class GridSpace : MonoBehaviour {
 		spriteRend.sprite = Resources.Load<Sprite>(charName + "/" + size);
 		//gameControl.AddLocation(character + " " + size, this.name);
 
-		gameControl.AddLocation(this.name, new Items.Item(size,charName), charNum);
+		gameControl.AddLocation(this.name, new Item(size,charName), charNum);
 
 
 
