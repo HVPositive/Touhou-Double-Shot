@@ -71,6 +71,11 @@ public class GameControl : MonoBehaviour {
 		boardCounter++;
 	}
 
+	public void DecBoardCounter(){
+		boardCounter--;
+	}
+
+
 	public int GetBoardCounter(){
 		return boardCounter;
 	}
@@ -94,10 +99,15 @@ public class GameControl : MonoBehaviour {
 		battleStart = !battleStart;
 	}
 
+	public bool CheckLocation(string gridspace, int playerNum){
+		return !(GetLocations(playerNum).ContainsKey(gridspace));
 
-	public void AddLocation(string gridspace, Item newI, int playerNum){
-		GetLocations(playerNum).Add(gridspace, newI);
 	}
+	public void AddLocation(string gridspace, Item newI, int playerNum){
+			GetLocations(playerNum).Add(gridspace, newI);
+		
+	}
+
 	public Dictionary<string,Item> GetLocations(int playerNum){
 		if (playerNum == 1)
 			return p1Locations;

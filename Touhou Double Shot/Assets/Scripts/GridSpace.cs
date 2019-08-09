@@ -71,10 +71,17 @@ public class GridSpace : MonoBehaviour {
 	
 	public void SetSprite(int charNum, string size){
 		string charName = GetCharName(charNum);
-		spriteRend.sprite = Resources.Load<Sprite>(charName + "/" + size);
+		
 		//gameControl.AddLocation(character + " " + size, this.name);
-
-		gameControl.AddLocation(this.name, new Item(size,charName), charNum);
+		
+		//if (gameControl.CheckLocation(this.name, charNum))
+		if (gameControl.CheckLocation(this.name, charNum)){
+			gameControl.AddLocation(this.name, new Item(size,charName), charNum);
+			spriteRend.sprite = Resources.Load<Sprite>(charName + "/" + size);
+		} else {
+			gameControl.DecBoardCounter();
+			Debug.Log("Space already occupied.");
+		}
 
 
 
@@ -95,7 +102,6 @@ public class GridSpace : MonoBehaviour {
 	//even is p1, odd is p2 turn
 
 	public void CheckHit(){
-
 
 		int pNum = 0;
 
