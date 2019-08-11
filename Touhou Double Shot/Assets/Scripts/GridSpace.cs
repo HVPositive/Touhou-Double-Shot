@@ -93,9 +93,18 @@ public class GridSpace : MonoBehaviour {
 			return;
 		}
 
+		if (!gameControl.CheckHighlight()){
+			gameControl.ToggleHighlight();
+		}
+		gameControl.SetSelectedPos(GetComponent<Transform>().position);
+		gameControl.MoveHighlight();
+		
+
 		if (gameControl.GetCommand() == "attack"){
 			//TODO 
 			CheckHit();
+		} else if (gameControl.GetCommand() == "move"){
+			
 		}
 
 	}
@@ -113,6 +122,9 @@ public class GridSpace : MonoBehaviour {
 
 		if (gameControl.GetLocations(pNum).ContainsKey(this.name) ){
 			Debug.Log("nice hit");
+			gameControl.GetLocations(pNum)[this.name].HitItem();
+			gameControl.UpdateStatusWindows();
+
 		} else if (CheckGraze(pNum)){
 			Debug.Log("nice graze");
 		} else{

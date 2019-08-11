@@ -35,5 +35,12 @@ public class Item{
 		return health;
 	}
 
+	public void HitItem(){
+		if (health>0)
+			health--;
+	}
+	public string GetSize(){
+		return size;
+	}
 
 }
