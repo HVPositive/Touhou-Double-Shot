@@ -94,17 +94,21 @@ public class GridSpace : MonoBehaviour {
 		}
 
 		if (!gameControl.CheckHighlight()){
-			gameControl.ToggleHighlight();
+			gameControl.ActivateHighlight();
 		}
-		gameControl.SetSelectedPos(GetComponent<Transform>().position);
+		gameControl.SetHighlight(GetComponent<Button>());
 		gameControl.MoveHighlight();
 		
 
 		if (gameControl.GetCommand() == "attack"){
 			//TODO 
 			CheckHit();
+			gameControl.SwapPlayerSide();
 		} else if (gameControl.GetCommand() == "move"){
-			
+			//TODO
+			//Move
+			MoveItem();
+			gameControl.SwapPlayerSide();
 		}
 
 	}
@@ -115,9 +119,9 @@ public class GridSpace : MonoBehaviour {
 		int pNum = 0;
 
 
-		if (gameControl.GetBoardCounter() % 2 == 0)
+		if (gameControl.GetPlayerSide() == gameControl.GetP1Char() )
 			pNum = 2; //If even, then p1's turn and check p2
-		else
+		else if (gameControl.GetPlayerSide() == gameControl.GetP2Char())
 			pNum = 1; 
 
 		if (gameControl.GetLocations(pNum).ContainsKey(this.name) ){
@@ -143,7 +147,7 @@ public class GridSpace : MonoBehaviour {
 		RaycastHit2D hit;
 		Vector2[] grazeVectors = new Vector2[] { Vector2.up, new Vector2(1,1), Vector2.right,
 		 										 new Vector2(1,-1), Vector2.down, new Vector2(-1,-1),
-		 										 Vector2.left, new Vector2(-1,1),Vector2.right};
+		 										 Vector2.left, new Vector2(-1,1)};
 
 		for (int i =0; i < grazeVectors.Length; i++){
 			hit = Physics2D.Raycast(transform.position, grazeVectors[i]);
@@ -158,6 +162,13 @@ public class GridSpace : MonoBehaviour {
 
 	}
 
+	public void MoveItem(){
+
+		gameControl.IncBoardCounter();
+		gameControl.ResetCommand();
+
+	}
+
 	public string GetCharName(int num){
 		if (num ==1)
 			return gameControl.GetP1Char();
@@ -166,4 +177,6 @@ public class GridSpace : MonoBehaviour {
 		else
 			return "reimu"; //default char?
 	}
+
+
 }

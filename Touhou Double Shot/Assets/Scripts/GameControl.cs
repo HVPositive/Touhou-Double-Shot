@@ -14,6 +14,7 @@ public class GameControl : MonoBehaviour {
 	public Transform p1Status;
 	public Transform p2Status;
 	public Transform highlight;
+	public GameObject commandButtons;
 
 	private int maxHealth;
 	private string playerSide;
@@ -27,13 +28,14 @@ public class GameControl : MonoBehaviour {
 
 	private string command;
 
-	private Vector3 selectedPos;
+
+	private Button highlightedButton;
 
 	private void Start(){
 
 		maxHealth = 3;
 		boardCounter = 0;
-		playerSide = "0";
+		//playerSide = p1Char;
 
 		battleStart = false;
 
@@ -44,6 +46,7 @@ public class GameControl : MonoBehaviour {
 		p2Char = "marisa";
 
 		command = "Board Setup";
+		playerSide = p1Char;
 
 	}
 
@@ -71,8 +74,20 @@ public class GameControl : MonoBehaviour {
 		return playerSide;
 	}
 
-	public void SetPlayerSide(string newPlayer){
-		playerSide = newPlayer;
+	public void SwapPlayerSide(){
+		if (playerSide == p1Char){
+			playerSide = p2Char;
+
+
+			TurnOffButtons(GetPlayerButtons(p2Locations));
+		}
+		else if (playerSide == p2Char){
+			playerSide = p1Char;
+
+
+			TurnOffButtons(GetPlayerButtons(p1Locations));
+		}
+		DeactivateHighlight();
 	}
 
 	public void IncBoardCounter(){
@@ -102,14 +117,13 @@ public class GameControl : MonoBehaviour {
 		ResetBoardCounter();
 		command = "";
 		SetUpStatus();
-
+		//Do it for first turn
 		TurnOffButtons(GetPlayerButtons(p1Locations));
 	}
 
 	public void ToggleBattle(){
 		battleStart = !battleStart;
 	}
-
 	//If space is already occupied, it is true and returns false
 	//Else, does not contain key, then returns true;
 	public bool CheckLocation(string gridspace, int playerNum){
@@ -118,7 +132,6 @@ public class GameControl : MonoBehaviour {
 	}
 	public void AddLocation(string gridspace, Item newI, int playerNum){
 			GetLocations(playerNum).Add(gridspace, newI);
-		
 	}
 
 	public Dictionary<string,Item> GetLocations(int playerNum){
@@ -129,7 +142,14 @@ public class GameControl : MonoBehaviour {
 		else 
 			return new Dictionary<string,Item>(); //empty list
 	}
-
+	public Dictionary<string,Item> GetLocations(){
+		if (playerSide == p1Char)
+			return p1Locations;
+		else if (playerSide == p2Char)
+			return p2Locations;
+		else 
+			return new Dictionary<string,Item>(); //empty list
+	}
 	public string GetP1Char(){
 		return p1Char;
 	}
@@ -143,9 +163,18 @@ public class GameControl : MonoBehaviour {
 	}
 	public void SetAttackCommand(){
 		command = "attack";
+		//TurnOnButtons();
+		TurnOffButtons(GetAttackButtons(highlightedButton));
 	}
 	public void SetMoveCommand(){
 		command = "move";
+		TurnOffButtons(GetMoveButtons(highlightedButton));
+	}
+
+	public void BackCommand(){
+		DeactivateHighlight();
+		TurnOffButtons(GetPlayerButtons(GetLocations()));
+		ResetCommand();
 	}
 	public void ResetCommand(){
 		command = "";
@@ -220,9 +249,13 @@ public class GameControl : MonoBehaviour {
 	}	
 
 	public void MoveHighlight(){
-		highlight.position = selectedPos;
+		highlight.position = highlightedButton.GetComponent<Transform>().position;
 	}
 
+	public void SetHighlight(Button b){
+		highlightedButton = b;
+	}
+	/*
 	public void SetSelectedPos(Vector3 pos){
 		selectedPos = pos;
 	}
@@ -230,15 +263,29 @@ public class GameControl : MonoBehaviour {
 	public Vector3 GetSelectedPos(){
 		return selectedPos;
 	}
-
+*/
 	public bool CheckHighlight(){
 		return highlight.gameObject.activeSelf;
 
 	}
 
-	public void ToggleHighlight(){
-		highlight.gameObject.SetActive(!highlight.gameObject.activeSelf);
+	public void ActivateHighlight(){
+		highlight.gameObject.SetActive(true);
+		ActivateCommandButtons();
 	}
+	public void DeactivateHighlight(){
+		highlight.gameObject.SetActive(false);
+		DectivateCommandButtons();
+	}
+
+	public void ActivateCommandButtons(){
+		commandButtons.SetActive(true);
+	}
+
+	public void DectivateCommandButtons(){
+		commandButtons.SetActive(false);
+	}
+
 
 
 	public void TurnOnButtons(){
@@ -248,7 +295,8 @@ public class GameControl : MonoBehaviour {
 	}
 
 	public void TurnOffButtons(List<Button> excluded){
-		
+		//Turn on all buttons before turning off all buttons
+		TurnOnButtons();
 		foreach (var button in buttons){
 
 			if (!excluded.Contains(button))
@@ -256,7 +304,8 @@ public class GameControl : MonoBehaviour {
 		}
 
 	}
-
+	//locs - location of player's items
+	//Returns a list of buttons the players items
 	public List<Button> GetPlayerButtons(Dictionary<string,Item> locs){
 		List<Button> playerButtons = new List<Button>();
 		foreach (var button in buttons){
@@ -266,5 +315,74 @@ public class GameControl : MonoBehaviour {
 		}
 		return playerButtons;
 	}
+
+	//
+	//return list of buttons around another button
+	public List<Button> GetAttackButtons(Button buttonLoc){
+		List<Button> attackButtons = new List<Button>();
+
+		RaycastHit2D hit;
+		Vector2[] attackVectors = new Vector2[] { Vector2.up, new Vector2(1,1), Vector2.right,
+		 										 new Vector2(1,-1), Vector2.down, new Vector2(-1,-1),
+		 										 Vector2.left, new Vector2(-1,1)};
+
+		for (int i =0; i < attackVectors.Length; i++){
+			hit = Physics2D.Raycast(buttonLoc.GetComponent<Transform>().position, attackVectors[i]);
+
+			if (hit.collider!=null)
+				attackButtons.Add(hit.collider.gameObject.GetComponent<Button>());
+
+		}
+
+
+		return attackButtons;
+	}
+
+	public List<Button> GetMoveButtons(Button buttonLoc){
+		List<Button> moveButtons = new List<Button>();
+
+		RaycastHit2D hit;
+		Vector2[] moveVectors = new Vector2[] { Vector2.up, Vector2.right,
+		 										Vector2.down, 
+		 										Vector2.left};
+
+		for (int i =0; i < moveVectors.Length; i++){
+			hit = Physics2D.Raycast(buttonLoc.GetComponent<Transform>().position, moveVectors[i]);
+
+			if (hit.collider!=null)
+				moveButtons.Add(hit.collider.gameObject.GetComponent<Button>());
+
+			//keep on raycasting in direction and add buttons
+			while (hit.collider!=null){
+				hit = Physics2D.Raycast(hit.collider.gameObject.GetComponent<Transform>().position, moveVectors[i]);
+				
+				if (hit.collider!=null)
+					moveButtons.Add(hit.collider.gameObject.GetComponent<Button>());
+
+			}
+
+		}
+
+		return moveButtons;
+	}
+
+
+	//used to check if two buttons are adjacent. NOt used but kept for now
+	public bool CheckAdjacent(Button b1, Button b2){
+
+		//Gets angle between buttons and casts ray from the first button in previous angle. Then if the hit object is same as second button, then they are adjacent 
+		RaycastHit2D hit;
+		hit  = Physics2D.Raycast(b1.GetComponent<Transform>().position, b2.GetComponent<Transform>().position - b1.GetComponent<Transform>().position );
+
+		//Debug.Log( hit.collider.gameObject.name );
+		if (hit.collider!=null && (hit.collider.gameObject.name == b2.gameObject.name) )
+			return true;
+		else
+			return false;
+
+
+
+	}
+
 }
 
