@@ -13,12 +13,11 @@ public class GameControl : MonoBehaviour {
 	public Text currentCommandText;
 	public Transform p1Status;
 	public Transform p2Status;
-	public Transform highlight;
+	public Transform highlight; // the transform of the highlighter
 	public GameObject commandButtons;
 
 	private int maxHealth;
 	private string playerSide;
-	private int boardCounter;
 	private bool battleStart;
 	private Dictionary<string,Item> p1Locations;
 	private Dictionary<string,Item> p2Locations;
@@ -34,7 +33,6 @@ public class GameControl : MonoBehaviour {
 	private void Start(){
 
 		maxHealth = 3;
-		boardCounter = 0;
 		//playerSide = p1Char;
 
 		battleStart = false;
@@ -51,15 +49,14 @@ public class GameControl : MonoBehaviour {
 	}
 
 	private void Update(){
+		//Handle Player Turn Text
+
+		currentPlayerText.text = playerSide;
 
 		if (battleStart){
 
 
-			//Handle Player Turn Text
-			if (boardCounter%2 == 0)
-				currentPlayerText.text = p1Char;
-			else
-				currentPlayerText.text = p2Char;
+
 
 			//Handle Current Command Text
 			currentCommandText.text = command;
@@ -74,38 +71,23 @@ public class GameControl : MonoBehaviour {
 		return playerSide;
 	}
 
+
 	public void SwapPlayerSide(){
 		if (playerSide == p1Char){
 			playerSide = p2Char;
 
 
-			TurnOffButtons(GetPlayerButtons(p2Locations));
+			if (battleStart) TurnOffButtons(GetPlayerButtons(p2Locations));
 		}
 		else if (playerSide == p2Char){
 			playerSide = p1Char;
 
 
-			TurnOffButtons(GetPlayerButtons(p1Locations));
+			if (battleStart) TurnOffButtons(GetPlayerButtons(p1Locations));
 		}
 		DeactivateHighlight();
 	}
 
-	public void IncBoardCounter(){
-		boardCounter++;
-	}
-
-	public void DecBoardCounter(){
-		boardCounter--;
-	}
-
-
-	public int GetBoardCounter(){
-		return boardCounter;
-	}
-
-	public void ResetBoardCounter(){
-		boardCounter = 0;
-	}
 
 	public bool BattleState(){
 		return battleStart;
@@ -114,7 +96,7 @@ public class GameControl : MonoBehaviour {
 	public void StartBattle(){
 
 		ToggleBattle();
-		ResetBoardCounter();
+
 		command = "";
 		SetUpStatus();
 		//Do it for first turn
@@ -124,20 +106,25 @@ public class GameControl : MonoBehaviour {
 	public void ToggleBattle(){
 		battleStart = !battleStart;
 	}
-	//If space is already occupied, it is true and returns false
-	//Else, does not contain key, then returns true;
-	public bool CheckLocation(string gridspace, int playerNum){
-		return !(GetLocations(playerNum).ContainsKey(gridspace));
+
+
+	public bool CheckLocation(string gridspace){
+		return !(GetLocations().ContainsKey(gridspace));
 
 	}
-	public void AddLocation(string gridspace, Item newI, int playerNum){
-			GetLocations(playerNum).Add(gridspace, newI);
+
+	public void AddLocation(string gridspace, Item newI){
+			GetLocations().Add(gridspace, newI);
 	}
 
-	public Dictionary<string,Item> GetLocations(int playerNum){
-		if (playerNum == 1)
+	public void RemoveLocation(string gridspace){
+		GetLocations().Remove(gridspace);
+	}
+
+	public Dictionary<string,Item> GetLocations(string playerNum){
+		if (playerNum == p1Char)
 			return p1Locations;
-		else if (playerNum == 2)
+		else if (playerNum == p2Char)
 			return p2Locations;
 		else 
 			return new Dictionary<string,Item>(); //empty list
@@ -181,9 +168,6 @@ public class GameControl : MonoBehaviour {
 	}
 
 	public void SetUpStatus(){
-		Transform currentItem;
-
-
 		SetPlayerStatus(p1Char, p1Status);
 		SetPlayerStatus(p2Char, p2Status);
 
@@ -255,15 +239,7 @@ public class GameControl : MonoBehaviour {
 	public void SetHighlight(Button b){
 		highlightedButton = b;
 	}
-	/*
-	public void SetSelectedPos(Vector3 pos){
-		selectedPos = pos;
-	}
 
-	public Vector3 GetSelectedPos(){
-		return selectedPos;
-	}
-*/
 	public bool CheckHighlight(){
 		return highlight.gameObject.activeSelf;
 
@@ -367,7 +343,7 @@ public class GameControl : MonoBehaviour {
 	}
 
 
-	//used to check if two buttons are adjacent. NOt used but kept for now
+	//used to check if two buttons are adjacent. Not used but kept for now
 	public bool CheckAdjacent(Button b1, Button b2){
 
 		//Gets angle between buttons and casts ray from the first button in previous angle. Then if the hit object is same as second button, then they are adjacent 
@@ -382,6 +358,127 @@ public class GameControl : MonoBehaviour {
 
 
 
+	}
+
+
+	public void MoveItem(string newSpace, SpriteRenderer sr){
+		string highlightedName = highlightedButton.gameObject.name;
+		//Copy highlighted item to newspace
+		if (SetSprite(newSpace, sr,GetLocations()[highlightedName]) ){
+
+		//remove old space from dictionary
+			RemoveLocation(highlightedName);
+		
+		//remove the sprite
+			highlightedButton.GetComponentInChildren<SpriteRenderer>().sprite = null;
+
+
+			SwapPlayerSide();
+			ResetCommand();
+		}
+	}
+
+	public string GetNextSize(){
+		Dictionary<string,Item> locs = GetLocations();
+		
+		if (GetItem("large", locs) ==null)
+			return "large";
+		else if (GetItem("medium", locs) == null)
+			return "medium";
+		else if (GetItem("small", locs) == null)
+			return "small";
+
+		return "swap";
+	}
+
+	public bool SetSprite(string space, SpriteRenderer sr){
+		string size = GetNextSize();
+		//string charName = GetCharName(charNum);
+		
+		if (CheckLocation(space)){
+			AddLocation(space, new Item(size));
+			sr.sprite = Resources.Load<Sprite>(playerSide + "/" + size);
+			return true;
+		} else {
+			Debug.Log("Space already occupied.");
+			return false;
+		}
+
+
+
+
+	}
+	public bool SetSprite(string space, SpriteRenderer sr, Item item){
+
+		//string charName = GetCharName(charNum);
+		
+		//gameControl.AddLocation(character + " " + size, this.name);
+		
+		//if (gameControl.CheckLocation(this.name, charNum))
+		if (CheckLocation(space)){
+			AddLocation(space, item);
+			sr.sprite = Resources.Load<Sprite>(playerSide + "/" + item.GetSize());
+			return true;
+		} else {
+
+			Debug.Log("Space already occupied.");
+			return false;
+		}
+
+
+
+	}
+
+
+	public void CheckHit(string space, Vector2 pos){
+
+
+
+
+		if (GetLocations(GetOppositeTurn()).ContainsKey(space) ){
+			Debug.Log("nice hit");
+			GetLocations(GetOppositeTurn())[space].HitItem();
+			UpdateStatusWindows();
+
+		} else if (CheckGraze(pos)){
+			Debug.Log("nice graze");
+		} else{
+			Debug.Log("nice miss");
+		}
+		SwapPlayerSide();
+		ResetCommand();
+
+	} 	
+
+
+	public bool CheckGraze(Vector2 pos){
+		bool hitFound = false;
+
+		RaycastHit2D hit;
+		Vector2[] grazeVectors = new Vector2[] { Vector2.up, new Vector2(1,1), Vector2.right,
+		 										 new Vector2(1,-1), Vector2.down, new Vector2(-1,-1),
+		 										 Vector2.left, new Vector2(-1,1)};
+
+		for (int i =0; i < grazeVectors.Length; i++){
+			hit = Physics2D.Raycast(pos, grazeVectors[i]);
+
+			if (hit.collider!=null && GetLocations(GetOppositeTurn()).ContainsKey(hit.collider.gameObject.name))
+				hitFound = true;
+
+		}
+
+		return hitFound;
+
+
+	}
+
+	public string GetOppositeTurn(){
+		if (playerSide == p1Char)
+			return p2Char;
+		else if (playerSide == p2Char)
+			return p1Char;
+
+		return "";
 	}
 
 }

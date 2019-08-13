@@ -13,13 +13,13 @@ public class Item{
 	private string size;
 
 		//side/character it belongs to
-	private string side;
-	private string character;
+	//private string side;
+	//private string character;
 
 
-	public Item(string sz, string chara){
+	public Item(string sz){
 		size = sz;
-		character = chara;
+		//character = chara;
 			
 		if (size == "large")
 			health = 3;
