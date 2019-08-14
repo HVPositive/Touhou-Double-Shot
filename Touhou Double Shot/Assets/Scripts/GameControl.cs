@@ -27,6 +27,9 @@ public class GameControl : MonoBehaviour {
 
 	private string command;
 
+	private Color regular;
+	private Color fade;
+
 
 	private Button highlightedButton;
 
@@ -45,6 +48,9 @@ public class GameControl : MonoBehaviour {
 
 		command = "Board Setup";
 		playerSide = p1Char;
+
+		regular = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+		fade = new Color(1.0f, 1.0f, 1.0f, 0.4f);
 
 	}
 
@@ -121,6 +127,15 @@ public class GameControl : MonoBehaviour {
 		GetLocations().Remove(gridspace);
 	}
 
+	public Dictionary<string,Item> GetOppositeLocations(){
+		if (playerSide == p1Char)
+			return p2Locations;
+		else if (playerSide == p2Char)
+			return p1Locations;
+		else 
+			return new Dictionary<string,Item>(); //empty list
+	}	
+
 	public Dictionary<string,Item> GetLocations(string playerNum){
 		if (playerNum == p1Char)
 			return p1Locations;
@@ -180,6 +195,15 @@ public class GameControl : MonoBehaviour {
 		UpdatePlayerStatus(p2Locations, p2Status);
 	}
 
+	public Transform OppositeStatus(){
+		if (playerSide == p1Char)
+			return p2Status;
+		else if (playerSide == p2Char)
+			return p1Status;
+		else 
+			return null; //empty list		
+	}
+
 	public void SetPlayerStatus(string charName, Transform playerStatus){
 		Transform currentItem;
 
@@ -204,9 +228,13 @@ public class GameControl : MonoBehaviour {
 		//Set up each item
 		for (int i =0; i< playerStatus.childCount; i++){
 			currentItem = playerStatus.GetChild(i);
+			if (GetItem(currentItem.gameObject.name, locs) != null)
+				itemHP = GetItem(currentItem.gameObject.name, locs).GetHealth();
+			else
+				itemHP = 0;
 
-			itemHP = GetItem(currentItem.gameObject.name, locs).GetHealth();
-
+			if (itemHP == 0 )
+				currentItem.GetComponent<SpriteRenderer>().color = fade;
 			//maxHealth -i = the hp for that size
 			//hp  = ^ - 
 			//Sets health display
@@ -223,6 +251,33 @@ public class GameControl : MonoBehaviour {
 		}
 	}
 
+	public void UpdateSingleStatus(Dictionary<string,Item> locs, Transform playerStatus, string size){
+		Transform currentItem = playerStatus.Find(size);
+		int itemHP;
+
+		if (GetItem(currentItem.gameObject.name, locs) != null)
+			itemHP = GetItem(currentItem.gameObject.name, locs).GetHealth();
+		else
+			itemHP = 0;
+
+		if (itemHP == 0 )
+			currentItem.GetComponent<SpriteRenderer>().color = fade;
+		//maxHealth -i = the hp for that size
+		//hp  = ^ - 
+		//Sets health display
+
+		int i = 3-SizeHP(size);
+		//itemhp = 3 2 1
+		for (int j =0; j< (maxHealth - i); j++){
+
+			if (j< itemHP)
+				currentItem.GetChild(j).gameObject.SetActive(true);
+			else
+				currentItem.GetChild(j).gameObject.SetActive(false);
+		}
+
+		
+	}
 
 	public Item GetItem(string sz, Dictionary<string,Item> locs){
 		foreach(var key in locs.Keys){
@@ -378,6 +433,8 @@ public class GameControl : MonoBehaviour {
 		}
 	}
 
+
+
 	public string GetNextSize(){
 		Dictionary<string,Item> locs = GetLocations();
 		
@@ -430,15 +487,20 @@ public class GameControl : MonoBehaviour {
 	}
 
 
-	public void CheckHit(string space, Vector2 pos){
+	public void CheckHit(string space, Vector2 pos, SpriteRenderer sr){
 
 
 
 
-		if (GetLocations(GetOppositeTurn()).ContainsKey(space) ){
+		if (GetOppositeLocations().ContainsKey(space) ){
 			Debug.Log("nice hit");
-			GetLocations(GetOppositeTurn())[space].HitItem();
-			UpdateStatusWindows();
+			string size = GetOppositeLocations()[space].GetSize();
+			if (GetOppositeLocations()[space].HitItem() == 0)
+				ItemDeath(space,sr);
+				
+				//we want to remove it from the dictionary, change opacity in, and remove from board
+			//UpdateStatusWindows(); (Dictionary<string,Item> locs, Transform playerStatus, string size
+			UpdateSingleStatus(GetOppositeLocations(),OppositeStatus(), size );
 
 		} else if (CheckGraze(pos)){
 			Debug.Log("nice graze");
@@ -462,7 +524,7 @@ public class GameControl : MonoBehaviour {
 		for (int i =0; i < grazeVectors.Length; i++){
 			hit = Physics2D.Raycast(pos, grazeVectors[i]);
 
-			if (hit.collider!=null && GetLocations(GetOppositeTurn()).ContainsKey(hit.collider.gameObject.name))
+			if (hit.collider!=null && GetOppositeLocations().ContainsKey(hit.collider.gameObject.name))
 				hitFound = true;
 
 		}
@@ -481,5 +543,22 @@ public class GameControl : MonoBehaviour {
 		return "";
 	}
 
+	public void ItemDeath(string space, SpriteRenderer sr){
+		GetOppositeLocations().Remove(space);
+		sr.sprite = null;
+	}
+
+	public int SizeHP(string size){
+		if (size == "large")
+			return 3;
+		else if (size == "medium")
+			return 2;
+		else if (size == "small")
+			return 1;
+		return 0;
+	}
+
 }
+
+
 

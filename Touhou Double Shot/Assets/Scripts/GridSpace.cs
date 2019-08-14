@@ -66,7 +66,7 @@ public class GridSpace : MonoBehaviour {
 		}
 
 		if (gameControl.GetCommand() == "attack"){
-			gameControl.CheckHit(this.name, transform.position);
+			gameControl.CheckHit(this.name, transform.position, spriteRend);
 
 		} else if (gameControl.GetCommand() == "move"){
 
