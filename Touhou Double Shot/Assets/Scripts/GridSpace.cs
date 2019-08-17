@@ -35,7 +35,7 @@ public class GridSpace : MonoBehaviour {
 	public void SetSpace(){
 
 		if (gameControl.BattleState())
-			button.onClick.RemoveListener(SetSpace);
+			return;
 		else{
 			//make this done by turn count rather than hardcoded number
 			//Sets up the board depending on selected space.

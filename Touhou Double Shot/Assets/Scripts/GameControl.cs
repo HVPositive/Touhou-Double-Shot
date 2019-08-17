@@ -16,6 +16,8 @@ public class GameControl : MonoBehaviour {
 	public Transform highlight; // the transform of the highlighter
 	public GameObject commandButtons;
 
+	public GameObject WinText;
+
 	private int maxHealth;
 	private string playerSide;
 	private bool battleStart;
@@ -39,15 +41,10 @@ public class GameControl : MonoBehaviour {
 		//playerSide = p1Char;
 
 		battleStart = false;
-
 		p1Locations = new Dictionary<string,Item>();
 		p2Locations = new Dictionary<string,Item>();
 
-		p1Char = "reimu";
-		p2Char = "marisa";
-
-		command = "Board Setup";
-		playerSide = p1Char;
+		ResetVariables();
 
 		regular = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 		fade = new Color(1.0f, 1.0f, 1.0f, 0.4f);
@@ -57,7 +54,7 @@ public class GameControl : MonoBehaviour {
 	private void Update(){
 		//Handle Player Turn Text
 
-		currentPlayerText.text = playerSide;
+		currentPlayerText.text = UppercaseFirstChar(playerSide);
 
 		if (battleStart){
 
@@ -79,7 +76,10 @@ public class GameControl : MonoBehaviour {
 
 
 	public void SwapPlayerSide(){
-		if (playerSide == p1Char){
+		if (playerSide == "end"){
+			TurnOffButtons();
+
+		} else if (playerSide == p1Char){
 			playerSide = p2Char;
 
 
@@ -109,11 +109,20 @@ public class GameControl : MonoBehaviour {
 		TurnOffButtons(GetPlayerButtons(p1Locations));
 	}
 
+	public void RestartBoard(){
+		ToggleBattle();
+
+
+		ResetVariables();
+
+
+	}
+
 	public void ToggleBattle(){
 		battleStart = !battleStart;
 	}
 
-
+	//return false - if it contains a key
 	public bool CheckLocation(string gridspace){
 		return !(GetLocations().ContainsKey(gridspace));
 
@@ -182,6 +191,7 @@ public class GameControl : MonoBehaviour {
 		command = "";
 	}
 
+
 	public void SetUpStatus(){
 		SetPlayerStatus(p1Char, p1Status);
 		SetPlayerStatus(p2Char, p2Status);
@@ -202,6 +212,22 @@ public class GameControl : MonoBehaviour {
 			return p1Status;
 		else 
 			return null; //empty list		
+	}
+
+	public void ClearPlayerStatus(Transform playerStatus){
+		Transform currentItem;
+
+		//Set up each item
+		for (int i =0; i< playerStatus.childCount; i++){
+			currentItem = playerStatus.GetChild(i);
+			currentItem.GetComponent<SpriteRenderer>().sprite = null;
+			
+			//Sets health display
+			for (int j =0; j< maxHealth; j++){
+				 currentItem.GetChild(j).gameObject.SetActive(false);
+			}
+
+		}
 	}
 
 	public void SetPlayerStatus(string charName, Transform playerStatus){
@@ -331,6 +357,15 @@ public class GameControl : MonoBehaviour {
 		foreach (var button in buttons){
 
 			if (!excluded.Contains(button))
+				button.interactable = false;
+		}
+
+	}
+
+
+	public void TurnOffButtons(){
+
+		foreach (var button in buttons){
 				button.interactable = false;
 		}
 
@@ -501,6 +536,7 @@ public class GameControl : MonoBehaviour {
 				//we want to remove it from the dictionary, change opacity in, and remove from board
 			//UpdateStatusWindows(); (Dictionary<string,Item> locs, Transform playerStatus, string size
 			UpdateSingleStatus(GetOppositeLocations(),OppositeStatus(), size );
+			CheckWin();
 
 		} else if (CheckGraze(pos)){
 			Debug.Log("nice graze");
@@ -556,6 +592,41 @@ public class GameControl : MonoBehaviour {
 		else if (size == "small")
 			return 1;
 		return 0;
+	}
+
+
+	public string UppercaseFirstChar(string s){
+		return char.ToUpper(s[0]) + s.Substring(1);
+
+	}
+
+	public void CheckWin(){
+		if (GetOppositeLocations().Count ==0){
+			
+			WinText.SetActive(true);
+			WinText.GetComponentInChildren<Text>().text = UppercaseFirstChar(playerSide) + " Wins!";
+			playerSide = "end";
+		}
+	}
+
+	public void ResetVariables(){
+
+		p1Locations.Clear();
+		p2Locations.Clear();
+
+		p1Char = "reimu";
+		p2Char = "marisa";
+
+		command = "Board Setup";
+		playerSide = p1Char;
+		TurnOnButtons();
+		foreach (var b in buttons){
+			b.GetComponentInChildren<SpriteRenderer>().sprite = null;
+		}
+		WinText.SetActive(false);
+		ClearPlayerStatus(p1Status);
+		ClearPlayerStatus(p2Status);
+
 	}
 
 }
