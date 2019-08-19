@@ -1,6 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System;
+//using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,7 +53,7 @@ public class GameControl : MonoBehaviour {
 
 	private void Update(){
 		//Handle Player Turn Text
-
+		ComputerPlayer();
 		currentPlayerText.text = UppercaseFirstChar(playerSide);
 
 		if (battleStart){
@@ -123,6 +123,7 @@ public class GameControl : MonoBehaviour {
 	}
 
 	//return false - if it contains a key
+	//return true - if it is a free space
 	public bool CheckLocation(string gridspace){
 		return !(GetLocations().ContainsKey(gridspace));
 
@@ -626,6 +627,61 @@ public class GameControl : MonoBehaviour {
 		WinText.SetActive(false);
 		ClearPlayerStatus(p1Status);
 		ClearPlayerStatus(p2Status);
+
+	}
+
+	public void ComputerPlayer(){
+
+		//set board
+		if (playerSide == p2Char && !battleStart){
+			//Random rand  = new Random();
+
+			int randomNumber = Random.Range(1,buttons.Count+1);
+
+			//if open space is not found, randomize again
+			while (!CheckLocation("Grid Space " + randomNumber.ToString() )) {
+				randomNumber = Random.Range(1,buttons.Count+1);
+			}
+
+			buttons[(randomNumber-1)].GetComponent<GridSpace>().SetSpace();
+			Debug.Log(randomNumber);
+
+			//computer player's turn and has not highlighted a space	
+		} else if (playerSide == p2Char && !CheckHighlight()){
+			//Highlight a space
+			buttons[GridSpaceToIndex(RandomItem())].GetComponent<GridSpace>().ButtonClick();
+			Debug.Log("test");
+
+			//Set to attack mode
+			SetAttackCommand();
+
+			//Attack a possible space
+			//buttons[GridSpaceToIndex(RandomItem( GetAttackButtons(highlightedButton) ) )]
+			RandomItem(GetAttackButtons(highlightedButton)).GetComponent<GridSpace>().ButtonClick();
+
+		}
+
+
+	}
+
+	//Returns a random button in current player's item locations
+	public string RandomItem(){
+		List<string> locs = new List<string>(GetLocations().Keys);
+
+		return locs[Random.Range(0,locs.Count)];
+	}
+
+	//Returns a random button in current player's item locations
+	public Button RandomItem(List<Button> spaces){
+		//List<string> locs = new List<string>(spaces.Values);
+		int n = Random.Range(0,spaces.Count);
+		Debug.Log(n);
+		return spaces[n];
+	}
+
+	//Converts a gridspace name to an index
+	public int GridSpaceToIndex(string n){
+		return int.Parse( n.Replace("Grid Space ", ""))-1;
 
 	}
 
