@@ -14,6 +14,7 @@ public class GameControl : MonoBehaviour {
 	public Transform p1Status;
 	public Transform p2Status;
 	public Transform highlight; // the transform of the highlighter
+	public Transform attackHighlight;
 	public GameObject commandButtons;
 
 	public GameObject WinText;
@@ -32,6 +33,9 @@ public class GameControl : MonoBehaviour {
 	private Color regular;
 	private Color fade;
 
+	private bool computerPlayer;
+	private bool computerDelay;
+
 
 	private Button highlightedButton;
 
@@ -49,11 +53,18 @@ public class GameControl : MonoBehaviour {
 		regular = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 		fade = new Color(1.0f, 1.0f, 1.0f, 0.4f);
 
+		computerPlayer = true;
+		computerDelay = false;
+
 	}
 
 	private void Update(){
 		//Handle Player Turn Text
-		ComputerPlayer();
+		
+		if (computerPlayer)
+			ComputerPlayer();
+
+
 		currentPlayerText.text = UppercaseFirstChar(playerSide);
 
 		if (battleStart){
@@ -357,7 +368,7 @@ public class GameControl : MonoBehaviour {
 		TurnOnButtons();
 		foreach (var button in buttons){
 
-			if (!excluded.Contains(button))
+			if (!excluded.Contains(button) || (playerSide == p2Char && computerPlayer))
 				button.interactable = false;
 		}
 
@@ -463,9 +474,12 @@ public class GameControl : MonoBehaviour {
 		//remove the sprite
 			highlightedButton.GetComponentInChildren<SpriteRenderer>().sprite = null;
 
+			//Hides attack highlight
+			HideAttackHighlight();
 
 			SwapPlayerSide();
 			ResetCommand();
+
 		}
 	}
 
@@ -484,23 +498,28 @@ public class GameControl : MonoBehaviour {
 		return "swap";
 	}
 
+
+	//Given a space and its sprite renderer, add a new item and set the sprite for the current player. Used in board setup
 	public bool SetSprite(string space, SpriteRenderer sr){
 		string size = GetNextSize();
 		//string charName = GetCharName(charNum);
 		
 		if (CheckLocation(space)){
 			AddLocation(space, new Item(size));
-			sr.sprite = Resources.Load<Sprite>(playerSide + "/" + size);
+
+			//don't set sprites for p2 if computer player is true
+			if (playerSide == p1Char || !computerPlayer )
+				sr.sprite = Resources.Load<Sprite>(playerSide + "/" + size);
+			
 			return true;
 		} else {
 			Debug.Log("Space already occupied.");
 			return false;
 		}
 
-
-
-
 	}
+
+	//Given a space and its sprite renderer, add the given item and set the given sprite depending on the item. Used for moving items
 	public bool SetSprite(string space, SpriteRenderer sr, Item item){
 
 		//string charName = GetCharName(charNum);
@@ -510,7 +529,11 @@ public class GameControl : MonoBehaviour {
 		//if (gameControl.CheckLocation(this.name, charNum))
 		if (CheckLocation(space)){
 			AddLocation(space, item);
-			sr.sprite = Resources.Load<Sprite>(playerSide + "/" + item.GetSize());
+
+			//don't set sprites for p2 if computer player is true - Should not matter since computer is not currently set to move its items
+			if (playerSide == p1Char || !computerPlayer)
+				sr.sprite = Resources.Load<Sprite>(playerSide + "/" + item.GetSize());
+
 			return true;
 		} else {
 
@@ -523,7 +546,7 @@ public class GameControl : MonoBehaviour {
 	}
 
 
-	public void CheckHit(string space, Vector2 pos, SpriteRenderer sr){
+	public void CheckHit(string space, Vector3 pos, SpriteRenderer sr){
 
 
 
@@ -547,10 +570,12 @@ public class GameControl : MonoBehaviour {
 		SwapPlayerSide();
 		ResetCommand();
 
+		MoveAttackHighlight(pos);
+
 	} 	
 
 
-	public bool CheckGraze(Vector2 pos){
+	public bool CheckGraze(Vector3 pos){
 		bool hitFound = false;
 
 		RaycastHit2D hit;
@@ -611,7 +636,8 @@ public class GameControl : MonoBehaviour {
 	}
 
 	public void ResetVariables(){
-
+		
+		MoveAttackHighlight(new Vector3(0.0f,0.0f,0.0f));
 		p1Locations.Clear();
 		p2Locations.Clear();
 
@@ -644,23 +670,35 @@ public class GameControl : MonoBehaviour {
 			}
 
 			buttons[(randomNumber-1)].GetComponent<GridSpace>().SetSpace();
-			Debug.Log(randomNumber);
+
 
 			//computer player's turn and has not highlighted a space	
-		} else if (playerSide == p2Char && !CheckHighlight()){
+		} else if (playerSide == p2Char && !CheckHighlight() && !computerDelay){
+
+			computerDelay = true;
+
+			StartCoroutine(computerWait());
 			//Highlight a space
-			buttons[GridSpaceToIndex(RandomItem())].GetComponent<GridSpace>().ButtonClick();
-			Debug.Log("test");
 
-			//Set to attack mode
-			SetAttackCommand();
 
-			//Attack a possible space
-			//buttons[GridSpaceToIndex(RandomItem( GetAttackButtons(highlightedButton) ) )]
-			RandomItem(GetAttackButtons(highlightedButton)).GetComponent<GridSpace>().ButtonClick();
-
+			
 		}
 
+
+	}
+
+	IEnumerator computerWait(){
+		yield return new WaitForSeconds(5);
+		buttons[GridSpaceToIndex(RandomItem())].GetComponent<GridSpace>().ButtonClick();
+
+
+		//Set to attack mode
+		SetAttackCommand();
+
+		//Attack a possible space
+		//buttons[GridSpaceToIndex(RandomItem( GetAttackButtons(highlightedButton) ) )]
+		RandomItem(GetAttackButtons(highlightedButton)).GetComponent<GridSpace>().ButtonClick();
+		computerDelay = false;
 
 	}
 
@@ -675,7 +713,7 @@ public class GameControl : MonoBehaviour {
 	public Button RandomItem(List<Button> spaces){
 		//List<string> locs = new List<string>(spaces.Values);
 		int n = Random.Range(0,spaces.Count);
-		Debug.Log(n);
+
 		return spaces[n];
 	}
 
@@ -685,6 +723,14 @@ public class GameControl : MonoBehaviour {
 
 	}
 
+	public void MoveAttackHighlight(Vector3 pos){
+		attackHighlight.position = pos;
+		//highlight.position=pos;
+	}
+
+	public void HideAttackHighlight(){
+		MoveAttackHighlight(new Vector3(0.0f,0.0f,0.0f));
+	}
 }
 
 
