@@ -11,6 +11,7 @@ public class GameControl : MonoBehaviour {
 	//public Text[] buttonList;
 	public Text currentPlayerText;
 	public Text currentCommandText;
+	public Text lastActionText;
 	public Transform p1Status;
 	public Transform p2Status;
 	public Transform highlight; // the transform of the highlighter
@@ -28,12 +29,12 @@ public class GameControl : MonoBehaviour {
 	private string p1Char;
 	private string p2Char;
 
-	private string command;
+	//private string command;
 
 	private Color regular;
 	private Color fade;
 
-	private bool computerPlayer;
+	public bool computerPlayer;
 	private bool computerDelay;
 
 
@@ -53,7 +54,7 @@ public class GameControl : MonoBehaviour {
 		regular = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 		fade = new Color(1.0f, 1.0f, 1.0f, 0.4f);
 
-		computerPlayer = true;
+		//computerPlayer = true;
 		computerDelay = false;
 
 	}
@@ -64,20 +65,6 @@ public class GameControl : MonoBehaviour {
 		if (computerPlayer)
 			ComputerPlayer();
 
-
-		currentPlayerText.text = UppercaseFirstChar(playerSide);
-
-		if (battleStart){
-
-
-
-
-			//Handle Current Command Text
-			currentCommandText.text = command;
-
-		} else{
-			currentCommandText.text = command;
-		}
 
 	}
 
@@ -91,18 +78,23 @@ public class GameControl : MonoBehaviour {
 			TurnOffButtons();
 
 		} else if (playerSide == p1Char){
-			playerSide = p2Char;
 
+			ClearSprites();
+			playerSide = p2Char;
+			RestoreSprites();
 
 			if (battleStart) TurnOffButtons(GetPlayerButtons(p2Locations));
 		}
 		else if (playerSide == p2Char){
-			playerSide = p1Char;
 
+			ClearSprites();
+			playerSide = p1Char;
+			RestoreSprites();
 
 			if (battleStart) TurnOffButtons(GetPlayerButtons(p1Locations));
 		}
 		DeactivateHighlight();
+		SetPlayerTurnText();
 	}
 
 
@@ -114,7 +106,7 @@ public class GameControl : MonoBehaviour {
 
 		ToggleBattle();
 
-		command = "";
+		SetCommandText("");
 		SetUpStatus();
 		//Do it for first turn
 		TurnOffButtons(GetPlayerButtons(p1Locations));
@@ -181,28 +173,32 @@ public class GameControl : MonoBehaviour {
 		return p2Char;
 	}
 
-	public string GetCommand(){
-		return command;
-	}
+
 	public void SetAttackCommand(){
-		command = "attack";
+		SetCommandText("attack");
 		//TurnOnButtons();
 		TurnOffButtons(GetAttackButtons(highlightedButton));
+
 	}
 	public void SetMoveCommand(){
-		command = "move";
+		SetCommandText("move");
 		TurnOffButtons(GetMoveButtons(highlightedButton));
 	}
 
 	public void BackCommand(){
 		DeactivateHighlight();
 		TurnOffButtons(GetPlayerButtons(GetLocations()));
-		ResetCommand();
-	}
-	public void ResetCommand(){
-		command = "";
+		SetCommandText("");
 	}
 
+
+	public void SetCommandText(string c){
+		currentCommandText.text = UppercaseFirstChar(c);
+	}
+
+	public string GetCommand(){
+		return currentCommandText.text;
+	}
 
 	public void SetUpStatus(){
 		SetPlayerStatus(p1Char, p1Status);
@@ -468,6 +464,7 @@ public class GameControl : MonoBehaviour {
 		//Copy highlighted item to newspace
 		if (SetSprite(newSpace, sr,GetLocations()[highlightedName]) ){
 
+			string size = GetLocations()[highlightedName].GetSize();
 		//remove old space from dictionary
 			RemoveLocation(highlightedName);
 		
@@ -477,8 +474,9 @@ public class GameControl : MonoBehaviour {
 			//Hides attack highlight
 			HideAttackHighlight();
 
+			SetLastActionText(" moved their " + size + " item.");
 			SwapPlayerSide();
-			ResetCommand();
+			SetCommandText("");
 
 		}
 	}
@@ -548,12 +546,15 @@ public class GameControl : MonoBehaviour {
 
 	public void CheckHit(string space, Vector3 pos, SpriteRenderer sr){
 
-
+		string action = " attacked and ";
 
 
 		if (GetOppositeLocations().ContainsKey(space) ){
-			Debug.Log("nice hit");
+			
 			string size = GetOppositeLocations()[space].GetSize();
+
+			action = action + "hit a " + size + " item.";
+
 			if (GetOppositeLocations()[space].HitItem() == 0)
 				ItemDeath(space,sr);
 				
@@ -562,21 +563,23 @@ public class GameControl : MonoBehaviour {
 			UpdateSingleStatus(GetOppositeLocations(),OppositeStatus(), size );
 			CheckWin();
 
-		} else if (CheckGraze(pos)){
-			Debug.Log("nice graze");
+		} else if (CheckGraze(pos).Count != 0){
+			action = action + "grazed " + ParseGraze(CheckGraze(pos));
 		} else{
-			Debug.Log("nice miss");
+			action = action + "missed.";
 		}
+
+		SetLastActionText(action);
 		SwapPlayerSide();
-		ResetCommand();
+		SetCommandText("");
 
 		MoveAttackHighlight(pos);
 
 	} 	
 
 
-	public bool CheckGraze(Vector3 pos){
-		bool hitFound = false;
+	public List<string> CheckGraze(Vector3 pos){
+		List<string> hitsFound = new List<string>();
 
 		RaycastHit2D hit;
 		Vector2[] grazeVectors = new Vector2[] { Vector2.up, new Vector2(1,1), Vector2.right,
@@ -586,12 +589,14 @@ public class GameControl : MonoBehaviour {
 		for (int i =0; i < grazeVectors.Length; i++){
 			hit = Physics2D.Raycast(pos, grazeVectors[i]);
 
-			if (hit.collider!=null && GetOppositeLocations().ContainsKey(hit.collider.gameObject.name))
-				hitFound = true;
+			if (hit.collider!=null && GetOppositeLocations().ContainsKey(hit.collider.gameObject.name)){
+				hitsFound.Add(GetOppositeLocations()[hit.collider.gameObject.name].GetSize());
+
+			}
 
 		}
 
-		return hitFound;
+		return hitsFound;
 
 
 	}
@@ -607,7 +612,9 @@ public class GameControl : MonoBehaviour {
 
 	public void ItemDeath(string space, SpriteRenderer sr){
 		GetOppositeLocations().Remove(space);
-		sr.sprite = null;
+		//only remove the space if you have not occupied it
+		if (!CheckLocation(space))
+			sr.sprite = null;
 	}
 
 	public int SizeHP(string size){
@@ -622,7 +629,12 @@ public class GameControl : MonoBehaviour {
 
 
 	public string UppercaseFirstChar(string s){
-		return char.ToUpper(s[0]) + s.Substring(1);
+		if (s == "")
+			return "";
+		else if (s.Length == 1)
+			return char.ToUpper(s[0]) + "";
+		else
+			return char.ToUpper(s[0]) + s.Substring(1);
 
 	}
 
@@ -643,8 +655,8 @@ public class GameControl : MonoBehaviour {
 
 		p1Char = "reimu";
 		p2Char = "marisa";
-
-		command = "Board Setup";
+		SetLastActionText();
+		SetCommandText("Board Setup");
 		playerSide = p1Char;
 		TurnOnButtons();
 		foreach (var b in buttons){
@@ -653,6 +665,7 @@ public class GameControl : MonoBehaviour {
 		WinText.SetActive(false);
 		ClearPlayerStatus(p1Status);
 		ClearPlayerStatus(p2Status);
+		SetPlayerTurnText();
 
 	}
 
@@ -731,6 +744,54 @@ public class GameControl : MonoBehaviour {
 	public void HideAttackHighlight(){
 		MoveAttackHighlight(new Vector3(0.0f,0.0f,0.0f));
 	}
+
+	public void SetPlayerTurnText(){
+		currentPlayerText.text = UppercaseFirstChar(playerSide);
+	}
+
+	public void SetLastActionText(string action){
+		lastActionText.text = UppercaseFirstChar(playerSide) + action;
+	}
+
+	public void SetLastActionText(){
+		lastActionText.text = "";
+	}
+
+	public string ParseGraze(List<string> g){
+		//string text = "";
+
+		//Debug.Log(temp.Count);
+		if (g.Count == 1)
+			return "a " + g[0] + " item.";
+		else if (g.Count == 2)
+			return g[0] + " and " + g[1] + " items.";
+		else if (g.Count == 3)
+			return g[0] + ", " + g[1] + ", and " + g[2] + " items.";
+		else 
+			return "";
+	}
+
+	public void ClearSprites(){
+		foreach (var button in buttons){
+				button.GetComponentInChildren<SpriteRenderer>().sprite = null;
+		}
+
+	}
+
+	public void RestoreSprites(){
+		foreach (var button in buttons){
+			string currentButton = button.gameObject.name;
+			if (!CheckLocation(currentButton)){
+
+
+				if (playerSide == p1Char || !computerPlayer)
+					button.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>(playerSide + "/" + GetLocations()[currentButton].GetSize());
+
+			}
+		}
+
+	}
+
 }
 
 
