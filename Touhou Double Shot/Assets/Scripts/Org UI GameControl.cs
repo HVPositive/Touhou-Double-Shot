@@ -3,20 +3,19 @@ using System.Collections.Generic;
 //using System;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 
-public class GameControl : MonoBehaviour {
+
+public class OrgGameControl : MonoBehaviour {
 
 	public List<Button> buttons;
-	public List<Transform> commandLocations;
 	//public Text[] buttonList;
-	//public Text currentCommandText;
+	public Text currentPlayerText;
+	public Text currentCommandText;
 	public Text lastActionText;
 	public Transform p1Status;
 	public Transform p2Status;
 	public Transform highlight; // the transform of the highlighter
 	public Transform attackHighlight;
-	public Transform commandHighlight;
 	public GameObject commandButtons;
 
 	public GameObject WinText;
@@ -30,7 +29,7 @@ public class GameControl : MonoBehaviour {
 	private string p1Char;
 	private string p2Char;
 
-	private string command;
+	//private string command;
 
 	private Color regular;
 	private Color fade;
@@ -95,7 +94,7 @@ public class GameControl : MonoBehaviour {
 			if (battleStart) TurnOffButtons(GetPlayerButtons(p1Locations));
 		}
 		DeactivateHighlight();
-
+		SetPlayerTurnText();
 	}
 
 
@@ -107,8 +106,7 @@ public class GameControl : MonoBehaviour {
 
 		ToggleBattle();
 
-		SetCommand("");
-		ClearCommandHighlight();
+		SetCommandText("");
 		SetUpStatus();
 		//Do it for first turn
 		TurnOffButtons(GetPlayerButtons(p1Locations));
@@ -177,32 +175,29 @@ public class GameControl : MonoBehaviour {
 
 
 	public void SetAttackCommand(){
-		SetCommand("attack");
+		SetCommandText("attack");
 		//TurnOnButtons();
-		MoveCommandHighlight();
 		TurnOffButtons(GetAttackButtons(highlightedButton));
 
 	}
 	public void SetMoveCommand(){
-		SetCommand("move");
-		MoveCommandHighlight();
+		SetCommandText("move");
 		TurnOffButtons(GetMoveButtons(highlightedButton));
 	}
 
 	public void BackCommand(){
 		DeactivateHighlight();
 		TurnOffButtons(GetPlayerButtons(GetLocations()));
-		SetCommand("");
-		ClearCommandHighlight();
+		SetCommandText("");
 	}
 
 
-	public void SetCommand(string c){
-		command = UppercaseFirstChar(c);
+	public void SetCommandText(string c){
+		currentCommandText.text = UppercaseFirstChar(c);
 	}
 
 	public string GetCommand(){
-		return command;
+		return currentCommandText.text;
 	}
 
 	public void SetUpStatus(){
@@ -251,6 +246,7 @@ public class GameControl : MonoBehaviour {
 			currentItem = playerStatus.GetChild(i);
 			currentItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(charName + "/" + currentItem.name);
 			currentItem.GetComponent<SpriteRenderer>().color = regular;
+			
 			//Sets health display
 			for (int j =0; j< (maxHealth-i); j++){
 				 currentItem.GetChild(j).gameObject.SetActive(true);
@@ -337,23 +333,6 @@ public class GameControl : MonoBehaviour {
 	public bool CheckHighlight(){
 		return highlight.gameObject.activeSelf;
 
-	}
-
-	public void MoveCommandHighlight(){
-		commandHighlight.gameObject.SetActive(true);
-		commandHighlight.position = GetCommandLocation();
-	}
-
-	public void ClearCommandHighlight(){
-		commandHighlight.gameObject.SetActive(false);
-	}
-
-	public Vector3 GetCommandLocation(){
-		foreach (var x in commandLocations){
-			if (x.gameObject.name == command)
-				return x.position;
-		}
-		return new Vector3(0.0f, 0.0f, 0.0f);
 	}
 
 	public void ActivateHighlight(){
@@ -484,8 +463,6 @@ public class GameControl : MonoBehaviour {
 	public void MoveItem(string newSpace, SpriteRenderer sr){
 		string highlightedName = highlightedButton.gameObject.name;
 		//Copy highlighted item to newspace
-
-		//Check if moving to that space is possible (if one of your spaces are already on that spot)
 		if (SetSprite(newSpace, sr,GetLocations()[highlightedName]) ){
 
 			string size = GetLocations()[highlightedName].GetSize();
@@ -500,8 +477,7 @@ public class GameControl : MonoBehaviour {
 
 			SetLastActionText(" moved their " + size + " item.");
 			SwapPlayerSide();
-			SetCommand("");
-			ClearCommandHighlight();
+			SetCommandText("");
 
 		}
 	}
@@ -596,8 +572,8 @@ public class GameControl : MonoBehaviour {
 
 		SetLastActionText(action);
 		SwapPlayerSide();
-		SetCommand("");
-		ClearCommandHighlight();
+		SetCommandText("");
+
 		MoveAttackHighlight(pos);
 
 	} 	
@@ -681,7 +657,7 @@ public class GameControl : MonoBehaviour {
 		p1Char = "reimu";
 		p2Char = "marisa";
 		SetLastActionText();
-		SetCommand("Board Setup");
+		SetCommandText("Board Setup");
 		playerSide = p1Char;
 		TurnOnButtons();
 		foreach (var b in buttons){
@@ -690,7 +666,7 @@ public class GameControl : MonoBehaviour {
 		WinText.SetActive(false);
 		ClearPlayerStatus(p1Status);
 		ClearPlayerStatus(p2Status);
-
+		SetPlayerTurnText();
 
 	}
 
@@ -771,6 +747,9 @@ public class GameControl : MonoBehaviour {
 		attackHighlight.gameObject.SetActive(false);
 	}
 
+	public void SetPlayerTurnText(){
+		currentPlayerText.text = UppercaseFirstChar(playerSide);
+	}
 
 	public void SetLastActionText(string action){
 		lastActionText.text = UppercaseFirstChar(playerSide) + action;
