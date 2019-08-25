@@ -11,7 +11,7 @@ public class GameControl : MonoBehaviour {
 	public List<Transform> commandLocations;
 	//public Text[] buttonList;
 	//public Text currentCommandText;
-	public Text lastActionText;
+	public GameObject lastActionText;
 	public Transform p1Status;
 	public Transform p2Status;
 	public Transform highlight; // the transform of the highlighter
@@ -20,6 +20,8 @@ public class GameControl : MonoBehaviour {
 	public GameObject commandButtons;
 
 	public GameObject WinText;
+
+	public GameObject logButton;
 
 	private int maxHealth;
 	private string playerSide;
@@ -37,6 +39,8 @@ public class GameControl : MonoBehaviour {
 
 	public bool computerPlayer;
 	private bool computerDelay;
+
+	private bool turnEnded;
 
 
 	private Button highlightedButton;
@@ -94,7 +98,7 @@ public class GameControl : MonoBehaviour {
 
 			if (battleStart) TurnOffButtons(GetPlayerButtons(p1Locations));
 		}
-		DeactivateHighlight();
+		
 
 	}
 
@@ -112,6 +116,7 @@ public class GameControl : MonoBehaviour {
 		SetUpStatus();
 		//Do it for first turn
 		TurnOffButtons(GetPlayerButtons(p1Locations));
+		logButton.SetActive(true);
 	}
 
 	public void RestartBoard(){
@@ -499,9 +504,7 @@ public class GameControl : MonoBehaviour {
 			HideAttackHighlight();
 
 			SetLastActionText(" moved their " + size + " item.");
-			SwapPlayerSide();
-			SetCommand("");
-			ClearCommandHighlight();
+			EndTurn();
 
 		}
 	}
@@ -595,9 +598,7 @@ public class GameControl : MonoBehaviour {
 		}
 
 		SetLastActionText(action);
-		SwapPlayerSide();
-		SetCommand("");
-		ClearCommandHighlight();
+		EndTurn();
 		MoveAttackHighlight(pos);
 
 	} 	
@@ -681,6 +682,7 @@ public class GameControl : MonoBehaviour {
 		p1Char = "reimu";
 		p2Char = "marisa";
 		SetLastActionText();
+		HideLastActionText();
 		SetCommand("Board Setup");
 		playerSide = p1Char;
 		TurnOnButtons();
@@ -691,6 +693,9 @@ public class GameControl : MonoBehaviour {
 		ClearPlayerStatus(p1Status);
 		ClearPlayerStatus(p2Status);
 
+		ResetLog();
+		turnEnded = false;
+		DectivateCommandButtons();
 
 	}
 
@@ -736,7 +741,7 @@ public class GameControl : MonoBehaviour {
 		//Attack a possible space
 		//buttons[GridSpaceToIndex(RandomItem( GetAttackButtons(highlightedButton) ) )]
 		RandomItem(GetAttackButtons(highlightedButton)).GetComponent<GridSpace>().ButtonClick();
-		computerDelay = false;
+		//computerDelay = false;
 
 	}
 
@@ -773,11 +778,26 @@ public class GameControl : MonoBehaviour {
 
 
 	public void SetLastActionText(string action){
-		lastActionText.text = UppercaseFirstChar(playerSide) + action;
+		lastActionText.gameObject.SetActive(true);
+		lastActionText.GetComponentInChildren<Text>().text = UppercaseFirstChar(playerSide) + action;
 	}
 
 	public void SetLastActionText(){
-		lastActionText.text = "";
+		lastActionText.GetComponentInChildren<Text>().text = "";
+	}
+
+	public void HideLastActionText(){
+		lastActionText.gameObject.SetActive(false);
+		if (turnEnded){
+			SwapPlayerSide();
+			turnEnded = false;
+			computerDelay = false;
+		}
+
+	}
+
+	public void ShowLastAction(){
+		lastActionText.gameObject.SetActive(true);
 	}
 
 	public string ParseGraze(List<string> g){
@@ -812,6 +832,22 @@ public class GameControl : MonoBehaviour {
 
 			}
 		}
+
+	}
+
+	public void ResetLog(){
+		lastActionText.GetComponentInChildren<Text>().text = "No previous action.";
+		logButton.SetActive(false);
+	}
+
+	public void EndTurn(){
+		turnEnded = true;
+		TurnOffButtons();
+		DeactivateHighlight();
+
+		//SwapPlayerSide();
+		SetCommand("");
+		ClearCommandHighlight();
 
 	}
 
