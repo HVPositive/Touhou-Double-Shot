@@ -254,7 +254,7 @@ public class GameControl : MonoBehaviour {
 		//Set up each item
 		for (int i =0; i< playerStatus.childCount; i++){
 			currentItem = playerStatus.GetChild(i);
-			currentItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>(charName + "/" + currentItem.name);
+			currentItem.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + charName + "/" + currentItem.name);
 			currentItem.GetComponent<SpriteRenderer>().color = regular;
 			//Sets health display
 			for (int j =0; j< (maxHealth-i); j++){
@@ -535,7 +535,7 @@ public class GameControl : MonoBehaviour {
 
 			//don't set sprites for p2 if computer player is true
 			if (playerSide == p1Char || !computerPlayer )
-				sr.sprite = Resources.Load<Sprite>(playerSide + "/" + size);
+				sr.sprite = Resources.Load<Sprite>("characters/" + playerSide + "/" + size);
 			
 			return true;
 		} else {
@@ -558,7 +558,7 @@ public class GameControl : MonoBehaviour {
 
 			//don't set sprites for p2 if computer player is true - Should not matter since computer is not currently set to move its items
 			if (playerSide == p1Char || !computerPlayer)
-				sr.sprite = Resources.Load<Sprite>(playerSide + "/" + item.GetSize());
+				sr.sprite = Resources.Load<Sprite>("characters/" + playerSide + "/" + item.GetSize());
 
 			return true;
 		} else {
@@ -828,7 +828,7 @@ public class GameControl : MonoBehaviour {
 
 
 				if (playerSide == p1Char || !computerPlayer)
-					button.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>(playerSide + "/" + GetLocations()[currentButton].GetSize());
+					button.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + playerSide + "/" + GetLocations()[currentButton].GetSize());
 
 			}
 		}
