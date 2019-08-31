@@ -708,11 +708,11 @@ MonoBehaviour:
     lineCount: 1
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 1
+  m_havePropertiesChanged: 0
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 1
+  m_isInputParsingRequired: 0
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
@@ -843,6 +843,16 @@ Prefab:
         type: 2}
       propertyPath: m_isInputParsingRequired
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114255425969593702, guid: e4cf7207752c9b747b0cb2232d9a4944,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1228695596}
+    - target: {fileID: 114255425969593702, guid: e4cf7207752c9b747b0cb2232d9a4944,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SelectCharacter
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
@@ -1073,7 +1083,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: c07752376de7a3247b467ea6b24ae5dc, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1081,7 +1091,7 @@ SpriteRenderer:
   m_Size: {x: 0.64, y: 0.64}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &787438008
@@ -1247,7 +1257,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &793345895
 Transform:
   m_ObjectHideFlags: 0
@@ -1348,7 +1358,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: c288e4ff6fa69de4ea53459aa2e4d2a0, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1356,7 +1366,7 @@ SpriteRenderer:
   m_Size: {x: 0.64, y: 0.64}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &821173536
@@ -1630,7 +1640,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: f5cd207da1de3a74bb8e68511f419026, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -1638,7 +1648,7 @@ SpriteRenderer:
   m_Size: {x: 0.64, y: 0.64}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!224 &1006116881 stripped
@@ -1790,7 +1800,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1131457201069400, guid: e4ccbcb570b1d3048876bfdefb3c255e, type: 2}
       propertyPath: m_Name
-      value: P1 Text
+      value: Player Text
       objectReference: {fileID: 0}
     - target: {fileID: 114285369861045420, guid: e4ccbcb570b1d3048876bfdefb3c255e,
         type: 2}
@@ -2003,6 +2013,16 @@ Prefab:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114255425969593702, guid: e4cf7207752c9b747b0cb2232d9a4944,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1228695596}
+    - target: {fileID: 114255425969593702, guid: e4cf7207752c9b747b0cb2232d9a4944,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SelectCharacter
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
   m_IsPrefabAsset: 0
@@ -2206,7 +2226,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 1131457201069400, guid: e4ccbcb570b1d3048876bfdefb3c255e, type: 2}
       propertyPath: m_Name
-      value: P1Char
+      value: Character Name
       objectReference: {fileID: 0}
     - target: {fileID: 114285369861045420, guid: e4ccbcb570b1d3048876bfdefb3c255e,
         type: 2}
@@ -2380,7 +2400,7 @@ GameObject:
   - component: {fileID: 1564723906}
   m_Layer: 5
   m_Name: Large
-  m_TagString: Untagged
+  m_TagString: p1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2915,6 +2935,15 @@ Prefab:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 114255425969593702, guid: e4cf7207752c9b747b0cb2232d9a4944,
+        type: 2}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1228695596}
+    - target: {fileID: 1846199068721598, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
+      propertyPath: m_Name
+      value: Character Display 1
+      objectReference: {fileID: 0}
     - target: {fileID: 114448971325343072, guid: e4cf7207752c9b747b0cb2232d9a4944,
         type: 2}
       propertyPath: m_havePropertiesChanged
@@ -2924,14 +2953,6 @@ Prefab:
         type: 2}
       propertyPath: m_isInputParsingRequired
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1101622600742260, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
-      propertyPath: m_TagString
-      value: Untagged
-      objectReference: {fileID: 0}
-    - target: {fileID: 1846199068721598, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
-      propertyPath: m_Name
-      value: Character Display 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e4cf7207752c9b747b0cb2232d9a4944, type: 2}
@@ -3119,7 +3140,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2142716028
 RectTransform:
   m_ObjectHideFlags: 0

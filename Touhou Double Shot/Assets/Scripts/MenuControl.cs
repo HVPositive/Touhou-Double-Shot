@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 
 public class MenuControl : MonoBehaviour {
 
@@ -16,11 +17,27 @@ public class MenuControl : MonoBehaviour {
 	private List<string> characterList;
 	private int charPage;
 
+	private string p1Char;
+	private string p2Char;
+
+	private string playerToSet;
+
+	private GameObject selectedButton;
+
+
 	private void Start(){
 		ReturnToMainMenu();
 
 		characterList = new List<string>();
 		charPage = 0;
+
+		p1Char = "";
+		p2Char = "";
+		playerToSet = "";
+
+
+
+
 	}
 
 	public void ReturnToMainMenu(){
@@ -31,9 +48,20 @@ public class MenuControl : MonoBehaviour {
 	public void OpenGameSetup(){
 		ShowMenu(playSettings);
 
+		if (p1Char != ""){
+			Transform player = playSettings.transform.GetChild(0);
+			player.Find("Character Name").GetComponent<TextMeshProUGUI>().SetText(UppercaseFirstChar(p1Char));
+			SetPlayerSettingSprites(player.Find("Sprites"), p1Char);
+
+		}
+
 	}
 
 	public void OpenCharacterSelect(){
+
+		playerToSet = EventSystem.current.currentSelectedGameObject.tag;
+
+
 		ShowMenu(characterSelect);
 		characterList.Clear();
 		charPage = 0;
@@ -134,6 +162,43 @@ public class MenuControl : MonoBehaviour {
 			m.SetActive(false);
 
 		s.SetActive(true);
+
+	}
+
+	public void SelectCharacter(){
+		//Debug.Log(EventSystem.current.currentSelectedGameObject.transform.parent.parent.gameObject.name);
+
+		SetCharName(EventSystem.current.currentSelectedGameObject.transform.Find("Name").GetComponent<TextMeshProUGUI>().text);
+		OpenGameSetup();
+		//OpenGameSetup();
+
+	}
+
+	public void SetCharName(string name){
+		if (playerToSet == "p1")
+			p1Char = name;
+		else if (playerToSet == "p2")
+			p2Char = name;
+
+
+	}
+
+	public string UppercaseFirstChar(string s){
+		if (s == "")
+			return "";
+		else if (s.Length == 1)
+			return char.ToUpper(s[0]) + "";
+		else
+			return char.ToUpper(s[0]) + s.Substring(1);
+
+	}
+
+	public void SetPlayerSettingSprites(Transform sprites, string character){
+
+		sprites.Find("Large").GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + character + "/large" );
+	 			
+	 	sprites.Find("Medium Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + character + "/medium" );
+	 	sprites.Find("Small Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + character + "/small" );
 
 	}
 }
