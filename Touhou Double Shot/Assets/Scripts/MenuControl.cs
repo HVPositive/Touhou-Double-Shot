@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class MenuControl : MonoBehaviour {
 
@@ -13,16 +14,18 @@ public class MenuControl : MonoBehaviour {
 	public GameObject mainMenu;
 	public GameObject playSettings;
 	public GameObject characterSelect;
+	public Toggle computerToggle;
 
 	private List<string> characterList;
 	private int charPage;
 
-	private string p1Char;
-	private string p2Char;
+	static public string p1Char;
+	static public string p2Char;
 
 	private string playerToSet;
 
 	private GameObject selectedButton;
+	static public bool computerPlayer = true;
 
 
 	private void Start(){
@@ -34,7 +37,7 @@ public class MenuControl : MonoBehaviour {
 		p1Char = "";
 		p2Char = "";
 		playerToSet = "";
-
+		computerPlayer = computerToggle.isOn;
 
 
 
@@ -54,6 +57,14 @@ public class MenuControl : MonoBehaviour {
 			SetPlayerSettingSprites(player.Find("Sprites"), p1Char);
 
 		}
+
+		if (p2Char != ""){
+			Transform player = playSettings.transform.GetChild(1);
+			player.Find("Character Name").GetComponent<TextMeshProUGUI>().SetText(UppercaseFirstChar(p2Char));
+			SetPlayerSettingSprites(player.Find("Sprites"), p2Char);
+
+		}
+
 
 	}
 
@@ -200,5 +211,13 @@ public class MenuControl : MonoBehaviour {
 	 	sprites.Find("Medium Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + character + "/medium" );
 	 	sprites.Find("Small Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + character + "/small" );
 
+	}
+
+	public void UpdateComputer(){
+		computerPlayer= computerToggle.isOn;
+	}
+
+	public void StartGame(){
+		SceneManager.LoadScene("Main", LoadSceneMode.Single);
 	}
 }

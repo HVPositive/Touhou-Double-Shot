@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using UnityEngine.SceneManagement;
+
 
 public class GameControl : MonoBehaviour {
 
@@ -37,7 +39,7 @@ public class GameControl : MonoBehaviour {
 	private Color regular;
 	private Color fade;
 
-	public bool computerPlayer;
+	private bool computerPlayer;
 	private bool computerDelay;
 
 	private bool turnEnded;
@@ -679,8 +681,21 @@ public class GameControl : MonoBehaviour {
 		p1Locations.Clear();
 		p2Locations.Clear();
 
-		p1Char = "reimu";
-		p2Char = "marisa";
+		if (MenuControl.p1Char == "" || MenuControl.p1Char == null )
+			p1Char = "reimu";
+		else
+			p1Char = MenuControl.p1Char;
+		
+		if (MenuControl.p2Char == "" || MenuControl.p2Char == null )
+			p2Char = "marisa";
+		else
+			p2Char = MenuControl.p2Char;
+
+		computerPlayer = MenuControl.computerPlayer;
+
+
+
+
 		SetLastActionText();
 		HideLastActionText();
 		SetCommand("Board Setup");
@@ -849,6 +864,10 @@ public class GameControl : MonoBehaviour {
 		SetCommand("");
 		ClearCommandHighlight();
 
+	}
+
+	public void ReturnToMenu(){
+		SceneManager.LoadScene("Start Menu", LoadSceneMode.Single);
 	}
 
 }
