@@ -14,7 +14,10 @@ public class MenuControl : MonoBehaviour {
 	public GameObject mainMenu;
 	public GameObject playSettings;
 	public GameObject characterSelect;
+	public GameObject tutorial;
 	public Toggle computerToggle;
+
+	public Button startButton;
 
 	private List<string> characterList;
 	private int charPage;
@@ -65,6 +68,9 @@ public class MenuControl : MonoBehaviour {
 
 		}
 
+		startButton.interactable = CheckStart();
+		SetBackForwardButtons();
+
 
 	}
 
@@ -83,7 +89,7 @@ public class MenuControl : MonoBehaviour {
  		}
 
  		LoadCharacterDisplays();
- 		SetBackForwardButtons();
+ 		
 
 
 
@@ -94,15 +100,17 @@ public class MenuControl : MonoBehaviour {
 			//7
 			//charpage*3 = 6
 			//0 1 2
-			Transform currentChar = characterSelect.GetComponent<Transform>().GetChild(i);
+			Transform currentDisplay = characterSelect.GetComponent<Transform>().GetChild(i);
 
+			//clear out display
 			if (charPage*3 +i >= characterList.Count){
 
-	 			SetCharacterDisplays(currentChar);
+	 			SetCharacterDisplays(currentDisplay);
 
+	 		//fill display
  			} else{
 				string currentName = characterList[charPage*3 + i];
-				SetCharacterDisplays(currentChar,currentName);
+				SetCharacterDisplays(currentDisplay,currentName);
 
  			}
 
@@ -111,7 +119,13 @@ public class MenuControl : MonoBehaviour {
 
 	public void SetCharacterDisplays(Transform characterDisplay, string n){
 
-		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().SetText(n);
+
+		if ( (playerToSet == "p1" && p2Char == n) || (playerToSet == "p2" && p1Char == n)  ) 
+			characterDisplay.GetComponent<Button>().interactable = false;
+		else
+			characterDisplay.GetComponent<Button>().interactable = true;
+
+		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().SetText(UppercaseFirstChar(n) );
 	 			
 
 	 	characterDisplay.Find("Large Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + n + "/large" );
@@ -123,6 +137,7 @@ public class MenuControl : MonoBehaviour {
 
 	public void SetCharacterDisplays(Transform characterDisplay){
 
+		characterDisplay.GetComponent<Button>().interactable = false;
 		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().SetText("");
 	 			
 
@@ -219,5 +234,16 @@ public class MenuControl : MonoBehaviour {
 
 	public void StartGame(){
 		SceneManager.LoadScene("Main", LoadSceneMode.Single);
+	}
+
+	public bool CheckStart(){
+		if (p1Char == "" || p2Char == "" || p1Char == p2Char)
+			return false;
+		else
+			return true;  
+	}
+
+	public void OpenTutorial(){
+		ShowMenu(tutorial);
 	}
 }
