@@ -21,6 +21,9 @@ public class MenuControl : MonoBehaviour {
 
 	private List<string> characterList;
 	private int charPage;
+	private int tutPage;
+	private int maxTutPage;
+	private List<string>  tutorialText;
 
 	static public string p1Char;
 	static public string p2Char;
@@ -36,12 +39,15 @@ public class MenuControl : MonoBehaviour {
 
 		characterList = new List<string>();
 		charPage = 0;
-
+		tutPage = 0;
 		p1Char = "";
 		p2Char = "";
 		playerToSet = "";
 		computerPlayer = computerToggle.isOn;
 
+
+
+		tutorialText = new List<string>(Resources.Load<TextAsset>("tutorial/tutorial").ToString().Split(new string[]{"||"}, System.StringSplitOptions.None));
 
 
 	}
@@ -69,13 +75,13 @@ public class MenuControl : MonoBehaviour {
 		}
 
 		startButton.interactable = CheckStart();
-		SetBackForwardButtons();
+		//SetBackForwardButtons();
 
 
 	}
 
 	public void OpenCharacterSelect(){
-
+		SetBackForwardButtons(characterSelect);
 		playerToSet = EventSystem.current.currentSelectedGameObject.tag;
 
 
@@ -151,25 +157,51 @@ public class MenuControl : MonoBehaviour {
 	public void NextCharacterPage(){
 		charPage+= 1;
 		LoadCharacterDisplays();
-		SetBackForwardButtons();
+		SetBackForwardButtons(characterSelect);
 	}
 
 	public void PreviousCharacterPage(){
 		charPage-= 1;
 		LoadCharacterDisplays();
-		SetBackForwardButtons();
+		SetBackForwardButtons(characterSelect);
 	}
 
-	public void SetBackForwardButtons(){
-		Button forward = characterSelect.transform.Find("Forward").GetComponent<Button>();
-		Button back = characterSelect.transform.Find("Backward").GetComponent<Button>();
+	public void NextTutorialPage(){
+		tutPage+= 1;
+		SetTutorialText();
+		SetBackForwardButtons(tutorial);
+	}
 
-		if (charPage == 0)
+	public void PreviousTutorialPage(){
+		tutPage-= 1;
+		SetTutorialText();
+		SetBackForwardButtons(tutorial);
+	}
+
+	public void SetBackForwardButtons(GameObject menu){
+		Button forward = menu.transform.Find("Forward").GetComponent<Button>();
+		Button back = menu.transform.Find("Backward").GetComponent<Button>();
+
+		int page =0;
+		int maxPage = 0;
+
+		if (menu.tag == "character select"){
+			page = charPage;
+			maxPage = (characterList.Count-1)/3; 
+		} else if (menu.tag == "tutorial"){
+			page = tutPage;
+			maxPage = tutorialText.Count-1;
+		}
+
+
+
+
+		if (page == 0)
 			back.interactable = false;
 		else
 			back.interactable = true;
 
-		if ( (charPage+1)*3 <= characterList.Count)
+		if (page < maxPage)
 			forward.interactable = true;
 		else
 			forward.interactable = false;
@@ -245,5 +277,12 @@ public class MenuControl : MonoBehaviour {
 
 	public void OpenTutorial(){
 		ShowMenu(tutorial);
+		SetTutorialText();
+		SetBackForwardButtons(tutorial);
+	}
+
+	public void SetTutorialText(){
+
+		tutorial.transform.Find("Text").GetComponent<TextMeshProUGUI>().SetText(tutorialText[tutPage]);
 	}
 }

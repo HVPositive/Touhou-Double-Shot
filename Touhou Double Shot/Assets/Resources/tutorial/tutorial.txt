@@ -1,0 +1,26 @@
+The goal of this game is to destroy your opponent's item while avoiding your opponent's attacks.
+
+In the game setup, you can choose your characters and set player 2 as a CPU player.
+||At the start of the game, you will first set up the locations of your items in the following order
+
+Large > Medium > Small
+ 
+These items have 1-3 hitpoints corresponding to their size and are destroyed when they reach 0.
+||At the start of your turn, select an item then choose a command or hit back to select another item.
+
+Once a command is completed, a result box will be shown and can be clicked to end your turn.
+||Attacking
+
+Spaces around your chosen item will be highlighted and you may attack any of those spaces.
+
+Your attack can hit, graze (adjacent hit) or miss the enemy items.
+||Moving
+
+Your items can move vertically or horizontally.
+
+However, they cannot move to the same space as your other items.
+||Other
+
+Pressing the log button allows you to review the last action made.
+
+Once someone wins, you can restart with the same characters or return to the main menu.

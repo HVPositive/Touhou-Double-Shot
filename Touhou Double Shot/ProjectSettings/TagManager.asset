@@ -7,6 +7,8 @@ TagManager:
   - Grid Space
   - p1
   - p2
+  - character select
+  - tutorial
   layers:
   - Default
   - TransparentFX
