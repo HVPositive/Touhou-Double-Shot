@@ -13,7 +13,7 @@ Once a command is completed, a result box will be shown and can be clicked to en
 
 Spaces around your chosen item will be highlighted and you may attack any of those spaces.
 
-Your attack can hit, graze (adjacent hit) or miss the enemy items.
+Your attack can hit, graze (adjacent hit) or miss the enemy items. A yellow outline shows the last space attacked.
 ||Moving
 
 Your items can move vertically or horizontally.
