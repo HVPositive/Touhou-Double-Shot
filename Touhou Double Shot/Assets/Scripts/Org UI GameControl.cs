@@ -683,7 +683,7 @@ public class OrgGameControl : MonoBehaviour {
 				randomNumber = Random.Range(1,buttons.Count+1);
 			}
 
-			buttons[(randomNumber-1)].GetComponent<GridSpace>().SetSpace();
+			buttons[(randomNumber-1)].GetComponent<GridSpace>().ButtonClick();
 
 
 			//computer player's turn and has not highlighted a space	

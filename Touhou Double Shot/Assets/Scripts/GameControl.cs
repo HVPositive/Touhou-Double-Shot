@@ -1,55 +1,79 @@
 using System.Collections;
 using System.Collections.Generic;
-//using System;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-
 public class GameControl : MonoBehaviour {
 
+	//List of the grid space buttons
 	public List<Button> buttons;
+
+	//Location of the command buttons for highlighting
 	public List<Transform> commandLocations;
-	//public Text[] buttonList;
-	//public Text currentCommandText;
-	public GameObject lastActionText;
-	public Transform p1Status;
-	public Transform p2Status;
-	public Transform highlight; // the transform of the highlighter
-	public Transform attackHighlight;
-	public Transform commandHighlight;
+
+	//Game object containing all of the command buttons
 	public GameObject commandButtons;
 
+	//Status displays for each player
+	public Transform p1Status;
+	public Transform p2Status;
+
+	//The highlight
+	public Transform highlight; //item selection highlight
+	public Transform attackHighlight; //highlight to show the location of the last space attacked
+	public Transform commandHighlight; //hightlight to show the selected command
+	
+
+	//Game object containing log text
+	public GameObject lastActionText;
+
+	//Game object containing win text
 	public GameObject WinText;
 
+	//The button to display the last command/log
 	public GameObject logButton;
 
-	private int maxHealth;
+	//Max health for items
+	private const int maxHealth = 3;
+
+	//Current player's turn
 	private string playerSide;
+
+	//if the battle has started
 	private bool battleStart;
+
+	//Dictionary containing the location and item for both players
 	private Dictionary<string,Item> p1Locations;
 	private Dictionary<string,Item> p2Locations;
 
+	//The character names of each player
 	private string p1Char;
 	private string p2Char;
 
+	//The current command selected
 	private string command;
 
+	//Colors for status 
 	private Color regular;
-	private Color fade;
+	private Color fade; //Used for an item that is destroyed
 
+	//If player 2 should take their turn automatically
 	private bool computerPlayer;
+
+	//Turned on if computer is taking their turn - prevents computer from doing their turn multiple times during delay
 	private bool computerDelay;
 
+	//Ensures playerSide is not swapped to the other player too early
 	private bool turnEnded;
 
-
+	//Keeps track of the button that is highlighted
 	private Button highlightedButton;
 
 	private void Start(){
 
-		maxHealth = 3;
+		
 		//playerSide = p1Char;
 
 		battleStart = false;
@@ -65,13 +89,48 @@ public class GameControl : MonoBehaviour {
 		computerDelay = false;
 
 	}
+	//Reset/reload the game variables
+	public void ResetVariables(){
+		
+		HideAttackHighlight();
+		p1Locations.Clear();
+		p2Locations.Clear();
+
+		//Load variables from game settings menu or load default values
+		if (MenuControl.p1Char == "" || MenuControl.p1Char == null )
+			p1Char = "reimu";
+		else
+			p1Char = MenuControl.p1Char;
+		
+		if (MenuControl.p2Char == "" || MenuControl.p2Char == null )
+			p2Char = "marisa";
+		else
+			p2Char = MenuControl.p2Char;
+
+		computerPlayer = MenuControl.computerPlayer;
+
+		SetLastActionText();
+		HideLastActionText();
+		SetCommand("Board Setup");
+		playerSide = p1Char;
+		TurnOnButtons();
+		foreach (var b in buttons){
+			b.GetComponentInChildren<SpriteRenderer>().sprite = null;
+		}
+		WinText.SetActive(false);
+		ClearPlayerStatus(p1Status);
+		ClearPlayerStatus(p2Status);
+
+		ResetLog();
+		turnEnded = false;
+		DectivateCommandButtons();
+
+	}
 
 	private void Update(){
-		//Handle Player Turn Text
-		
+		//function for computer to take actions automatically
 		if (computerPlayer)
 			ComputerPlayer();
-
 
 	}
 
@@ -672,47 +731,11 @@ public class GameControl : MonoBehaviour {
 			WinText.SetActive(true);
 			WinText.GetComponentInChildren<Text>().text = UppercaseFirstChar(playerSide) + " Wins!";
 			playerSide = "end";
+			computerPlayer = false; //Ensures the computer does not take any actions at this point
 		}
 	}
 
-	public void ResetVariables(){
-		
-		HideAttackHighlight();
-		p1Locations.Clear();
-		p2Locations.Clear();
 
-		if (MenuControl.p1Char == "" || MenuControl.p1Char == null )
-			p1Char = "reimu";
-		else
-			p1Char = MenuControl.p1Char;
-		
-		if (MenuControl.p2Char == "" || MenuControl.p2Char == null )
-			p2Char = "marisa";
-		else
-			p2Char = MenuControl.p2Char;
-
-		computerPlayer = MenuControl.computerPlayer;
-
-
-
-
-		SetLastActionText();
-		HideLastActionText();
-		SetCommand("Board Setup");
-		playerSide = p1Char;
-		TurnOnButtons();
-		foreach (var b in buttons){
-			b.GetComponentInChildren<SpriteRenderer>().sprite = null;
-		}
-		WinText.SetActive(false);
-		ClearPlayerStatus(p1Status);
-		ClearPlayerStatus(p2Status);
-
-		ResetLog();
-		turnEnded = false;
-		DectivateCommandButtons();
-
-	}
 
 	public void ComputerPlayer(){
 
@@ -727,7 +750,7 @@ public class GameControl : MonoBehaviour {
 				randomNumber = Random.Range(1,buttons.Count+1);
 			}
 
-			buttons[(randomNumber-1)].GetComponent<GridSpace>().SetSpace();
+			buttons[(randomNumber-1)].GetComponent<GridSpace>().ButtonClick();
 
 
 			//computer player's turn and has not highlighted a space	

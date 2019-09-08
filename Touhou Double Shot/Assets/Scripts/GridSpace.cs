@@ -9,72 +9,52 @@ public class GridSpace : MonoBehaviour {
 	private Button button;
 	private SpriteRenderer spriteRend;
 
-
-
 	public GameControl gameControl;
-
 
 	public void Start(){
 		button = GetComponent<Button>();
 		spriteRend = GetComponentInChildren<SpriteRenderer>();
-		button.onClick.AddListener(ButtonClick);
-		button.onClick.AddListener(SetSpace);
-
+		button.onClick.AddListener(ButtonClick); //Handles actions after the board has been setup
 
 	}
 
-	public void Update(){
-
-
-	}
-	public void  SetGameControlReference(GameControl control){
-		gameControl = control;
-	}
-
-
-	public void SetSpace(){
-
-		if (gameControl.BattleState())
-			return;
-		else{
-			//make this done by turn count rather than hardcoded number
-			//Sets up the board depending on selected space.
-
+	public void ButtonClick(){
+		//If battle is not started, button clicking sets up the board
+		if (!gameControl.BattleState()){
+			
+			//Sets the sprite on the gameboard
 			gameControl.SetSprite(this.name,spriteRend);
-			//SetSprite(gameControl.GetPlayerSide(), gameControl.GetNextSize());
 
+			//If the player has set all its sprites then swap the player side
 			if (gameControl.GetNextSize() == "swap"){
 				gameControl.SwapPlayerSide();
 
-				//after swapping sides and it says to swap again, start battle
+				//after swapping sides and it says to swap again, then both players have setup their board - so start battle
 				if (gameControl.GetNextSize() == "swap")
 					gameControl.StartBattle();
 
 			}
 
-		}
-
-	}
-
-	public void ButtonClick(){
-		if (!gameControl.BattleState()){
-			return;
-		}
-
-		if (!gameControl.CheckHighlight()){
-			gameControl.ActivateHighlight();
-		}
-
-		if (gameControl.GetCommand() == "Attack"){
-			gameControl.CheckHit(this.name, transform.position, spriteRend);
-
-		} else if (gameControl.GetCommand() == "Move"){
-
-			gameControl.MoveItem(this.name, spriteRend);
-
 		} else{
-			gameControl.SetHighlight(GetComponent<Button>());
-			gameControl.MoveHighlight();
+
+			//If the item selected highlight is off, turn it on
+			if (!gameControl.CheckHighlight()){
+				gameControl.ActivateHighlight();
+			}
+
+			//If no command is chosen, then player is selecting an item - Set this button as highlighted and move it to this button
+			if (gameControl.GetCommand() == ""){
+				gameControl.SetHighlight(GetComponent<Button>());
+				gameControl.MoveHighlight();
+			} else if (gameControl.GetCommand() == "Attack"){
+
+				gameControl.CheckHit(this.name, transform.position, spriteRend);
+
+			} else if (gameControl.GetCommand() == "Move"){
+
+				gameControl.MoveItem(this.name, spriteRend);
+
+			}
 		}
 
 	}
