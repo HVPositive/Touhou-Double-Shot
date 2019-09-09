@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using System.IO;
 using UnityEngine.UI;
 using TMPro;
@@ -15,6 +16,7 @@ public class MenuControl : MonoBehaviour {
 	public GameObject playSettings;
 	public GameObject characterSelect;
 	public GameObject tutorial;
+
 
 	//computer toggle in game settings
 	public Toggle computerToggle;
@@ -46,6 +48,7 @@ public class MenuControl : MonoBehaviour {
 
 
 
+
 	private void Start(){
 		ReturnToMainMenu();
 
@@ -58,6 +61,9 @@ public class MenuControl : MonoBehaviour {
 		playerToSet = "";
 		computerPlayer = computerToggle.isOn;
 
+		//Load list of characters
+ 		characterList = new List<string>(Resources.Load<TextAsset>("characters/characterList").ToString().Split(new string[]{"\r\n"}, System.StringSplitOptions.None));
+
 		//Load tutorial text
 		tutorialText = new List<string>(Resources.Load<TextAsset>("tutorial/tutorial").ToString().Split(new string[]{"||"}, System.StringSplitOptions.None));
 
@@ -65,7 +71,7 @@ public class MenuControl : MonoBehaviour {
 	}
 
 	//Shows the given menu and turns off all other menus
-	public void ShowMenu(GameObject s){
+	private void ShowMenu(GameObject s){
 		foreach (var m in allMenus)
 			m.SetActive(false);
 		s.SetActive(true);
@@ -73,11 +79,11 @@ public class MenuControl : MonoBehaviour {
 
 	// Menu Navigation  //
 
-	public void ReturnToMainMenu(){
+	private void ReturnToMainMenu(){
 		ShowMenu(mainMenu);
 	}
 
-	public void OpenGameSetup(){
+	private void OpenGameSetup(){
 		ShowMenu(playSettings);
 
 		//Update game setup according to current variables
@@ -87,7 +93,7 @@ public class MenuControl : MonoBehaviour {
 
 	}
 
-	public void OpenCharacterSelect(){
+	private void OpenCharacterSelect(){
 
 		//Reset character select variables
 		charPage = 0;
@@ -98,35 +104,29 @@ public class MenuControl : MonoBehaviour {
 
 		ShowMenu(characterSelect);
 
-		//Reload character list
-		characterList.Clear();
-		foreach (string file in System.IO.Directory.GetDirectories("Assets\\Resources\\characters")) { 
-			characterList.Add(Path.GetFileName(file)); 
- 		}
-
  		LoadCharacterSelectDisplays();
  		
 	}
 
-	public void OpenTutorial(){
+	private void OpenTutorial(){
 		tutPage = 0;
 		ShowMenu(tutorial);
 		SetTutorialText();
 		SetBackForwardButtons(tutorial);
 	}
 
-	public void QuitGame(){
+	private void QuitGame(){
 		Application.Quit();
 
 	}
 
 	//Game Setting functions
 
-	public void SetPlayerDisplay(Transform player, string characterName){
+	private void SetPlayerDisplay(Transform player, string characterName){
 		player.Find("Character Name").GetComponent<TextMeshProUGUI>().SetText(UppercaseFirstChar(characterName));
 		SetPlayerSettingSprites(player.Find("Sprites"), characterName);
 	}
-	public void SetPlayerSettingSprites(Transform sprites, string character){
+	private void SetPlayerSettingSprites(Transform sprites, string character){
 
 		if (character == ""){
 			sprites.Find("Large").GetComponentInChildren<SpriteRenderer>().sprite = null;
@@ -140,25 +140,25 @@ public class MenuControl : MonoBehaviour {
 
 	}
 	//Checks if variables are valid to start a game
-	public bool CheckStart(){
+	private bool CheckStart(){
 		if (p1Char == "" || p2Char == "" || p1Char == p2Char)
 			return false;
 		else
 			return true;  
 	}
 
-	public void UpdateComputer(){
+	private void UpdateComputer(){
 		computerPlayer= computerToggle.isOn;
 	}
 
-	public void StartGame(){
+	private void StartGame(){
 		SceneManager.LoadScene("Main", LoadSceneMode.Single);
 	}
 
 
 	//Character select functions
 
-	public void LoadCharacterSelectDisplays(){
+	private void LoadCharacterSelectDisplays(){
 
 		//Go through each character display and set them up
 		for (int i = 0; i<maxChars; i++){
@@ -181,7 +181,7 @@ public class MenuControl : MonoBehaviour {
  		}
 	}
 	//Set button interactability and set display 
-	public void SetCharacterDisplays(Transform characterDisplay, string n){
+	private void SetCharacterDisplays(Transform characterDisplay, string n){
 
 		//Checks if character has already been chosen to disable choosing it
 		if ((playerToSet == "p1" && p2Char == n) || (playerToSet == "p2" && p1Char == n)) 
@@ -189,7 +189,7 @@ public class MenuControl : MonoBehaviour {
 		else
 			characterDisplay.GetComponent<Button>().interactable = true;
 
-		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().SetText(UppercaseFirstChar(n) );
+		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().text = UppercaseFirstChar(n); //SetText(UppercaseFirstChar(n) );
 	 	characterDisplay.Find("Large Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + n + "/large" );
 	 	characterDisplay.Find("Medium Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + n + "/medium" );
 	 	characterDisplay.Find("Small Sprite").GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("characters/" + n + "/small" );
@@ -197,10 +197,10 @@ public class MenuControl : MonoBehaviour {
 	}
 
 	//No string name given, turn off button and clear display
-	public void SetCharacterDisplays(Transform characterDisplay){
+	private void SetCharacterDisplays(Transform characterDisplay){
 
 		characterDisplay.GetComponent<Button>().interactable = false;
-		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().SetText("");
+		characterDisplay.GetComponentInChildren<TextMeshProUGUI>().text = "";  //SetText("");
 	 			
 	 	characterDisplay.Find("Large Sprite").GetComponent<SpriteRenderer>().sprite = null;
 	 	characterDisplay.Find("Medium Sprite").GetComponent<SpriteRenderer>().sprite = null;
@@ -209,31 +209,33 @@ public class MenuControl : MonoBehaviour {
 	}
 
 	//Go to next page of characters
-	public void NextCharacterPage(){
+	private void NextCharacterPage(){
 		charPage+= 1;
 		LoadCharacterSelectDisplays();
 		SetBackForwardButtons(characterSelect);
 	}
 
 	//Go to previous page of characters
-	public void PreviousCharacterPage(){
+	private void PreviousCharacterPage(){
 		charPage-= 1;
 		LoadCharacterSelectDisplays();
 		SetBackForwardButtons(characterSelect);
 	}
 
 	//Select and set character then return to game setup
-	public void SelectCharacter(){
-		SetCharName(EventSystem.current.currentSelectedGameObject.transform.Find("Name").GetComponent<TextMeshProUGUI>().text);
+	private void SelectCharacter(){
+
+		SetCharName(EventSystem.current.currentSelectedGameObject.transform.Find("Character Name").GetComponent<TextMeshProUGUI>().text.ToLower());
 		OpenGameSetup();
+
 
 	}
 
-	public void SetCharName(string name){
+	private void SetCharName(string n){
 		if (playerToSet == "p1")
-			p1Char = name;
+			p1Char = n;
 		else if (playerToSet == "p2")
-			p2Char = name;
+			p2Char = n;
 	}
 
 
@@ -241,18 +243,18 @@ public class MenuControl : MonoBehaviour {
 	//Tutorial Functions
 
 
-	public void SetTutorialText(){
+	private void SetTutorialText(){
 
 		tutorial.transform.Find("Text").GetComponent<TextMeshProUGUI>().SetText(tutorialText[tutPage]);
 	}
 
-	public void NextTutorialPage(){
+	private void NextTutorialPage(){
 		tutPage+= 1;
 		SetTutorialText();
 		SetBackForwardButtons(tutorial);
 	}
 
-	public void PreviousTutorialPage(){
+	private void PreviousTutorialPage(){
 		tutPage-= 1;
 		SetTutorialText();
 		SetBackForwardButtons(tutorial);
@@ -262,7 +264,7 @@ public class MenuControl : MonoBehaviour {
 
 
 	//Given a menu and the current page, set the page navigation button
-	public void SetBackForwardButtons(GameObject menu){
+	private void SetBackForwardButtons(GameObject menu){
 		Button forward = menu.transform.Find("Forward").GetComponent<Button>();
 		Button back = menu.transform.Find("Backward").GetComponent<Button>();
 
@@ -291,7 +293,7 @@ public class MenuControl : MonoBehaviour {
 	}
 
 	//Returns a string with the first letter capitalized
-	public string UppercaseFirstChar(string s){
+	private string UppercaseFirstChar(string s){
 		if (s == "")
 			return "";
 		else if (s.Length == 1)

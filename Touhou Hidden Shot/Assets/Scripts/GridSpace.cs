@@ -11,7 +11,7 @@ public class GridSpace : MonoBehaviour {
 
 	public GameControl gameControl;
 
-	public void Start(){
+	private void Start(){
 		button = GetComponent<Button>();
 		spriteRend = GetComponentInChildren<SpriteRenderer>();
 		button.onClick.AddListener(ButtonClick); //Handles actions after the board has been setup
